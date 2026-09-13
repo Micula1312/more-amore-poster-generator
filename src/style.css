@@ -30,7 +30,13 @@ button:hover{background:#2a1c26}
 }
 .toolbar #exportPng{margin-left:auto;background:#ff3b9d;border-color:#ff3b9d;color:#fff;font-weight:800}
 #stage{flex:1;display:grid;place-items:center;overflow:hidden;padding:12px}
-canvas{max-width:100%;max-height:100%;display:block;box-shadow:0 20px 70px rgba(0,0,0,.45)}
+canvas{
+  max-width:100%;max-height:100%;display:block;
+  box-shadow:0 20px 70px rgba(0,0,0,.45);
+  cursor:default;user-select:none;-webkit-user-select:none
+}
+canvas.can-drag{cursor:grab}
+canvas.is-dragging{cursor:grabbing}
 .section-title{font-size:10px;opacity:.55;letter-spacing:.12em;margin-bottom:8px}
 .selected-name{font-size:20px;font-weight:800;margin:8px 0 18px}
 label{display:block;font-size:11px;margin:12px 0;color:#cfc3ca}
