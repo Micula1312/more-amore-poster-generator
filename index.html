@@ -9,7 +9,7 @@
     <div id="app">
       <aside class="panel panel-left">
         <div class="brand">MORE AMORE / POSTER GENERATOR</div>
-        <div class="section-title">TEXT LAYERS</div>
+        <div class="section-title">TEXT LAYERS — DRAG IN CANVAS</div>
         <div id="fields"></div>
 
         <div class="section-block">
@@ -29,15 +29,11 @@
         </div>
 
         <div class="section-block">
-          <div class="section-title">PNG LOGO</div>
+          <div class="section-title">MAIN LOGO — FIXED / CENTERED</div>
           <input id="logoUpload" class="file-input" type="file" accept="image/png,image/webp">
           <div class="two">
-            <label>Depth<input id="logoDepth" type="range" min="0" max="60" value="18"></label>
-            <label>Scale<input id="logoScale" type="range" min="0.2" max="2" step="0.01" value="1"></label>
-          </div>
-          <div class="two">
-            <label>X<input id="logoX" type="range" min="-500" max="500" value="0"></label>
-            <label>Y<input id="logoY" type="range" min="-650" max="650" value="510"></label>
+            <label>Depth<input id="logoDepth" type="range" min="2" max="80" value="28"></label>
+            <label>Scale<input id="logoScale" type="range" min="0.4" max="1.8" step="0.01" value="1"></label>
           </div>
           <label>Logo animation
             <select id="logoAnimation">
@@ -47,6 +43,14 @@
               <option value="wave">Wave</option>
             </select>
           </label>
+          <div class="fixed-note">Posizione bloccata al centro. Lo spessore resta visibile anche durante Rotate Y.</div>
+        </div>
+
+        <div class="section-block">
+          <div class="section-title">FIXED PARTNER LOGOS — BOTTOM RIGHT</div>
+          <label>Logo partner 1<input id="partnerLogo1" class="file-input" type="file" accept="image/png,image/webp"></label>
+          <label>Logo partner 2<input id="partnerLogo2" class="file-input" type="file" accept="image/png,image/webp"></label>
+          <div class="fixed-note">Due slot fissi, allineati in basso a destra. Per ora senza effetti.</div>
         </div>
       </aside>
 
@@ -55,6 +59,7 @@
           <button id="presetClassic">CLASSIC</button>
           <button id="presetChrome">CHROME</button>
           <button id="presetWarp">WARP</button>
+          <button id="exportVideo">EXPORT VIDEO</button>
           <button id="exportPng">EXPORT PNG</button>
         </div>
         <div id="stage"></div>
