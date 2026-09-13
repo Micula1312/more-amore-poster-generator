@@ -1,0 +1,108 @@
+name: Reset default text layout
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch default text layout and reset button
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p = Path('src/main.js')
+          s = p.read_text(encoding='utf-8')
+
+          old_fields = """const fields = {
+  logo: { label:'MORE AMORE TEXT', text:'MORE AMORE', size:52, depth:18, x:0, y:470, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:-0.12, bevel:3, metalness:.15, roughness:.3, color:'#fff1dc', animation:'none', animSpeed:1, animAmount:18 },
+  guest: { label:'GUEST', text:'GUEST NAME', size:85, depth:28, x:0, y:285, scaleX:1.05, scaleY:1, rotZ:0, rotX:-3, bend:.35, bevel:4, metalness:.25, roughness:.2, color:'#b77cff', animation:'none', animSpeed:1, animAmount:24 },
+  support1: { label:'SUPPORT 1', text:'ARTIST NAME 1', size:41, depth:14, x:0, y:95, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:-.12, bevel:2.5, metalness:.05, roughness:.4, color:'#f5ead8', animation:'none', animSpeed:1, animAmount:18 },
+  support2: { label:'SUPPORT 2', text:'ARTIST NAME 2', size:41, depth:14, x:0, y:5, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:-.08, bevel:2.5, metalness:.05, roughness:.4, color:'#f5ead8', animation:'none', animSpeed:1, animAmount:18 },
+  venue: { label:'VENUE', text:'CLUB NAME', size:46, depth:16, x:0, y:-155, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:.15, bevel:3, metalness:.15, roughness:.28, color:'#ff4a1a', animation:'none', animSpeed:1, animAmount:18 },
+  address: { label:'ADDRESS', text:'VIA INDIRIZZO, CITTÀ', size:22, depth:8, x:0, y:-255, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:.12, bevel:1.5, metalness:.1, roughness:.45, color:'#ff4a1a', animation:'none', animSpeed:1, animAmount:14 },
+  date: { label:'DATE', text:'DAY 00 MONTH', size:51, depth:18, x:-130, y:-405, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:-.12, bevel:3, metalness:.25, roughness:.25, color:'#b77cff', animation:'none', animSpeed:1, animAmount:18 },
+  time: { label:'TIME', text:'00:00 — 00:00', size:27, depth:10, x:-130, y:-520, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:1.5, metalness:.05, roughness:.4, color:'#f5ead8', animation:'none', animSpeed:1, animAmount:14 }
+};
+"""
+
+          new_fields = """const fields = {
+  logo: { label:'MORE AMORE TEXT', text:'MORE AMORE', size:44, depth:18, x:0, y:405, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:3, metalness:.15, roughness:.3, color:'#fff1dc', animation:'none', animSpeed:1, animAmount:18 },
+  guest: { label:'GUEST', text:'GUEST NAME', size:62, depth:24, x:0, y:260, scaleX:.9, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:4, metalness:.25, roughness:.2, color:'#b77cff', animation:'none', animSpeed:1, animAmount:24 },
+  support1: { label:'SUPPORT 1', text:'ARTIST NAME 1', size:36, depth:12, x:0, y:110, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:2.5, metalness:.05, roughness:.4, color:'#f5ead8', animation:'none', animSpeed:1, animAmount:18 },
+  support2: { label:'SUPPORT 2', text:'ARTIST NAME 2', size:36, depth:12, x:0, y:25, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:2.5, metalness:.05, roughness:.4, color:'#f5ead8', animation:'none', animSpeed:1, animAmount:18 },
+  venue: { label:'VENUE', text:'CLUB NAME', size:42, depth:14, x:0, y:-135, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:3, metalness:.15, roughness:.28, color:'#ff4a1a', animation:'none', animSpeed:1, animAmount:18 },
+  address: { label:'ADDRESS', text:'VIA INDIRIZZO, CITTÀ', size:20, depth:7, x:0, y:-225, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:1.5, metalness:.1, roughness:.45, color:'#ff4a1a', animation:'none', animSpeed:1, animAmount:14 },
+  date: { label:'DATE', text:'DAY 00 MONTH', size:42, depth:14, x:-150, y:-390, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:3, metalness:.25, roughness:.25, color:'#b77cff', animation:'none', animSpeed:1, animAmount:18 },
+  time: { label:'TIME', text:'00:00 — 00:00', size:24, depth:8, x:-150, y:-485, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:1.5, metalness:.05, roughness:.4, color:'#f5ead8', animation:'none', animSpeed:1, animAmount:14 }
+};
+const fieldDefaults = JSON.parse(JSON.stringify(fields));
+"""
+
+          if old_fields not in s:
+              raise SystemExit('default fields block not found')
+          s = s.replace(old_fields, new_fields)
+
+          old_dynamic = """  addFieldButton(id);
+  if(font) rebuild(id);
+  selectLayer(id);
+}
+"""
+          new_dynamic = """  fieldDefaults[id] = JSON.parse(JSON.stringify(fields[id]));
+  addFieldButton(id);
+  if(font) rebuild(id);
+  selectLayer(id);
+}
+"""
+          if old_dynamic not in s:
+              raise SystemExit('dynamic field tail not found')
+          s = s.replace(old_dynamic, new_dynamic, 1)
+
+          marker = """controls.animAmount.addEventListener('input',e=>fields[selected].animAmount=Number(e.target.value));
+
+"""
+          reset_code = """controls.animAmount.addEventListener('input',e=>fields[selected].animAmount=Number(e.target.value));
+
+function resetSelectedLayer(){
+  const current = fields[selected];
+  const defaults = fieldDefaults[selected];
+  if(!current || !defaults) return;
+  const text = current.text;
+  Object.assign(current, JSON.parse(JSON.stringify(defaults)));
+  current.text = text;
+  rebuild(selected);
+  syncControls();
+}
+
+document.querySelector('#resetLayer').addEventListener('click', resetSelectedLayer);
+
+"""
+          if marker not in s:
+              raise SystemExit('reset insertion marker not found')
+          s = s.replace(marker, reset_code, 1)
+
+          p.write_text(s, encoding='utf-8')
+
+          h = Path('index.html')
+          html = h.read_text(encoding='utf-8')
+          old = """        <div class=\"fx-row\">\n          <button data-fx=\"plastic\">PLASTIC</button>\n          <button data-fx=\"chrome\">CHROME</button>\n          <button data-fx=\"cream\">CREAM</button>\n        </div>\n"""
+          new = """        <div class=\"fx-row\">\n          <button data-fx=\"plastic\">PLASTIC</button>\n          <button data-fx=\"chrome\">CHROME</button>\n          <button data-fx=\"cream\">CREAM</button>\n        </div>\n        <button id=\"resetLayer\" type=\"button\" style=\"width:100%;margin-top:10px\">RESET POSIZIONE + EFFETTI</button>\n"""
+          if old not in html:
+              raise SystemExit('fx row not found in index')
+          html = html.replace(old, new, 1)
+          h.write_text(html, encoding='utf-8')
+          PY
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/main.js index.html
+          git diff --cached --quiet || git commit -m "Keep default text inside canvas and add layer reset"
+          git push
