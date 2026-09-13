@@ -252,12 +252,13 @@ function applyLogoBase(){
 }
 
 // Partner logos are permanently anchored inside the bottom-right safe area.
-const PARTNER_GAP = 18;
-const PARTNER_BOTTOM_MARGIN = 58;
-const PARTNER_RIGHT_MARGIN = 58;
+const PARTNER_GAP = 22;
+const PARTNER_PLANE_Z = -145;
+const PARTNER_BOTTOM_MARGIN = 92;
+const PARTNER_RIGHT_MARGIN = 86;
 const partnerStates = [
-  { group:null, texture:null, width:150, height:84, x:0, y:0 },
-  { group:null, texture:null, width:150, height:84, x:0, y:0 }
+  { group:null, texture:null, width:132, height:74, x:0, y:0 },
+  { group:null, texture:null, width:132, height:74, x:0, y:0 }
 ];
 
 function layoutPartnerLogos(){
@@ -275,7 +276,7 @@ function layoutPartnerLogos(){
     state.x = rightEdge - halfW;
     state.y = bottomY + halfH;
     rightEdge = state.x - halfW - PARTNER_GAP;
-    if(state.group) state.group.position.set(state.x,state.y,120);
+    if(state.group) state.group.position.set(state.x,state.y,PARTNER_PLANE_Z);
   }
 }
 
@@ -574,7 +575,7 @@ function setupPartnerUpload(selector,index){
   document.querySelector(selector).addEventListener('change',e=>{
     const file=e.target.files?.[0];
     if(!file) return;
-    loadImageAsTexture(file,150,84,({texture,width,height})=>{
+    loadImageAsTexture(file,132,74,({texture,width,height})=>{
       const state=partnerStates[index];
       if(state.texture) state.texture.dispose();
       Object.assign(state,{texture,width,height});
