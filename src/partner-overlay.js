@@ -1,3 +1,5 @@
+import './layout-defaults.js';
+
 const stage = document.querySelector('#stage');
 const input1 = document.querySelector('#partnerLogo1');
 const input2 = document.querySelector('#partnerLogo2');
@@ -53,7 +55,6 @@ if (stage && input1 && input2) {
     overlay.style.paddingBottom = `${Math.max(18, canvasRect.height * 0.055)}px`;
     overlay.style.gap = `${Math.max(10, canvasRect.width * 0.02)}px`;
 
-    // Explicit pixel dimensions relative to the visible poster so PNGs can never drift outside.
     slots.forEach(img => {
       img.style.maxWidth = `${Math.max(54, canvasRect.width * 0.15)}px`;
       img.style.maxHeight = `${Math.max(36, canvasRect.height * 0.08)}px`;
@@ -85,7 +86,6 @@ if (stage && input1 && input2) {
   requestAnimationFrame(syncOverlayToCanvas);
   setTimeout(syncOverlayToCanvas, 250);
 
-  // Composite PNG export so the fixed partner logos are also present in the downloaded poster.
   setTimeout(() => {
     const exportButton = document.querySelector('#exportPng');
     if (!exportButton) return;
