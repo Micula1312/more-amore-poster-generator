@@ -17,6 +17,15 @@
         <div id="fields"></div>
 
         <div class="section-block">
+          <div class="section-title">SKETCH PNG — DRAG IN CANVAS</div>
+          <label class="upload-button">+ SKETCH PNG
+            <input id="sketchUpload" class="file-input file-input-hidden" type="file" accept="image/png,image/webp" multiple>
+          </label>
+          <div id="sketchList" class="sketch-list"></div>
+          <div class="fixed-note">Puoi caricare più PNG trasparenti: entrano nel poster e sono trascinabili.</div>
+        </div>
+
+        <div class="section-block">
           <div class="section-title">BACKGROUND</div>
           <div class="palette-row">
             <button class="palette" data-palette="amore">AMORE</button>
@@ -54,7 +63,7 @@
           <div class="section-title">FIXED PARTNER LOGOS — BOTTOM RIGHT</div>
           <label>Logo partner 1<input id="partnerLogo1" class="file-input" type="file" accept="image/png,image/webp"></label>
           <label>Logo partner 2<input id="partnerLogo2" class="file-input" type="file" accept="image/png,image/webp"></label>
-          <div class="fixed-note">Due slot fissi, allineati in basso a destra. Per ora senza effetti.</div>
+          <div class="fixed-note">Due slot fissi tenuti dentro l’area sicura del poster, sempre visibili in basso a destra.</div>
         </div>
       </aside>
 
