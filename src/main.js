@@ -251,11 +251,33 @@ function applyLogoBase(){
   logoState.group.scale.setScalar(logoState.scale);
 }
 
-// Keep these clearly inside the perspective-safe part of the poster.
+// Partner logos are permanently anchored inside the bottom-right safe area.
+const PARTNER_GAP = 18;
+const PARTNER_BOTTOM_MARGIN = 58;
+const PARTNER_RIGHT_MARGIN = 58;
 const partnerStates = [
-  { group:null, texture:null, width:115, height:64, x:300, y:-515 },
-  { group:null, texture:null, width:115, height:64, x:425, y:-515 }
+  { group:null, texture:null, width:150, height:84, x:0, y:0 },
+  { group:null, texture:null, width:150, height:84, x:0, y:0 }
 ];
+
+function layoutPartnerLogos(){
+  const active = partnerStates.filter(state=>state.texture);
+  if(!active.length) return;
+
+  const bottomY = -HALF_H + PARTNER_BOTTOM_MARGIN;
+  let rightEdge = HALF_W - PARTNER_RIGHT_MARGIN;
+
+  for(let i=partnerStates.length-1; i>=0; i--){
+    const state = partnerStates[i];
+    if(!state.texture) continue;
+    const halfW = state.width / 2;
+    const halfH = state.height / 2;
+    state.x = rightEdge - halfW;
+    state.y = bottomY + halfH;
+    rightEdge = state.x - halfW - PARTNER_GAP;
+    if(state.group) state.group.position.set(state.x,state.y,120);
+  }
+}
 
 function buildPartnerLogo(index){
   const state = partnerStates[index];
@@ -267,17 +289,19 @@ function buildPartnerLogo(index){
     new THREE.MeshBasicMaterial({
       map:state.texture,
       transparent:true,
-      alphaTest:.02,
+      alphaTest:.01,
       side:THREE.DoubleSide,
-      depthTest:false
+      depthTest:false,
+      depthWrite:false,
+      toneMapped:false
     })
   );
-  mesh.renderOrder = 50;
+  mesh.renderOrder = 100;
   group.add(mesh);
-  group.position.set(state.x,state.y,80);
-  group.renderOrder = 50;
+  group.renderOrder = 100;
   state.group = group;
   scene.add(group);
+  layoutPartnerLogos();
 }
 
 function loadImageAsTexture(file, maxW, maxH, onReady){
@@ -550,11 +574,12 @@ function setupPartnerUpload(selector,index){
   document.querySelector(selector).addEventListener('change',e=>{
     const file=e.target.files?.[0];
     if(!file) return;
-    loadImageAsTexture(file,115,64,({texture,width,height})=>{
+    loadImageAsTexture(file,150,84,({texture,width,height})=>{
       const state=partnerStates[index];
       if(state.texture) state.texture.dispose();
       Object.assign(state,{texture,width,height});
       buildPartnerLogo(index);
+      layoutPartnerLogos();
     });
   });
 }
@@ -666,14 +691,7 @@ window.addEventListener('resize',fitStage);
 function ensureEverythingVisible(){
   Object.keys(fields).forEach(id=>{ clampFieldToPoster(id); applyBaseTransform(id); });
   applyLogoBase();
-  partnerStates.forEach((s,i)=>{
-    if(s.group){
-      const defaults=i===0?{x:300,y:-515}:{x:425,y:-515};
-      s.x=defaults.x;
-      s.y=defaults.y;
-      s.group.position.set(s.x,s.y,80);
-    }
-  });
+  layoutPartnerLogos();
   sketchStates.forEach(state=>{
     clampImageState(state);
     if(state.group) state.group.position.set(state.x,state.y,65);
