@@ -51,7 +51,6 @@ const palettes = {
   night: ['#03020a', '#1b1456', '#215dff'],
   sunset: ['#32101d', '#ff4a1a', '#ffb65c']
 };
-
 const bgState = { colors: [...palettes.amore], angle: 135 };
 
 function updateBackground(){
@@ -85,6 +84,8 @@ const fields = {
   time: { label:'TIME', text:'00:00 — 00:00', size:27, depth:10, x:0, y:-520, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:1.5, metalness:.05, roughness:.4, color:'#f5ead8', animation:'none', animSpeed:1, animAmount:14 }
 };
 
+let artistCounter = 0;
+let infoCounter = 0;
 let font;
 const meshes = {};
 let selected = 'guest';
@@ -93,13 +94,9 @@ const clock = new THREE.Clock();
 function makeMaterial(cfg){
   return new THREE.MeshStandardMaterial({ color: cfg.color, metalness: cfg.metalness, roughness: cfg.roughness });
 }
-
 function buildGeometry(cfg){
   const g = new TextGeometry(cfg.text, {
-    font,
-    size: cfg.size,
-    depth: cfg.depth,
-    curveSegments: 10,
+    font, size: cfg.size, depth: cfg.depth, curveSegments: 10,
     bevelEnabled: cfg.bevel > 0,
     bevelThickness: cfg.bevel * .65,
     bevelSize: cfg.bevel,
@@ -122,7 +119,6 @@ function buildGeometry(cfg){
   g.computeBoundingBox();
   return g;
 }
-
 function getTextHalfExtents(id){
   const mesh = meshes[id];
   if(!mesh || !mesh.geometry.boundingBox) return { x:40, y:20 };
@@ -132,7 +128,6 @@ function getTextHalfExtents(id){
     y:Math.max(10,(bb.max.y-bb.min.y)*Math.abs(fields[id].scaleY)/2)
   };
 }
-
 function clampFieldToPoster(id){
   const cfg = fields[id];
   const e = getTextHalfExtents(id);
@@ -141,9 +136,8 @@ function clampFieldToPoster(id){
   cfg.x = THREE.MathUtils.clamp(cfg.x,-maxX,maxX);
   cfg.y = THREE.MathUtils.clamp(cfg.y,-maxY,maxY);
 }
-
 function rebuild(id){
-  if(!font) return;
+  if(!font || !fields[id]) return;
   const cfg = fields[id];
   if(meshes[id]){
     scene.remove(meshes[id]);
@@ -160,11 +154,10 @@ function rebuild(id){
   clampFieldToPoster(id);
   applyBaseTransform(id);
 }
-
 function applyBaseTransform(id){
   const cfg = fields[id];
   const mesh = meshes[id];
-  if(!mesh) return;
+  if(!mesh || !cfg) return;
   mesh.position.set(cfg.x,cfg.y,0);
   mesh.rotation.set(THREE.MathUtils.degToRad(cfg.rotX),0,THREE.MathUtils.degToRad(cfg.rotZ));
   mesh.scale.set(cfg.scaleX,cfg.scaleY,1);
@@ -172,19 +165,9 @@ function applyBaseTransform(id){
 function rebuildAll(){ Object.keys(fields).forEach(rebuild); }
 
 const logoState = {
-  group:null,
-  texture:null,
-  width:480,
-  height:190,
-  depth:28,
-  scale:1,
-  x:0,
-  y:475,
-  animation:'none',
-  animSpeed:1,
-  animAmount:20
+  group:null, texture:null, width:480, height:190, depth:28, scale:1,
+  x:0, y:475, animation:'none', animSpeed:1, animAmount:20
 };
-
 function disposeGroup(group){
   if(!group) return;
   group.traverse(o=>{
@@ -194,19 +177,12 @@ function disposeGroup(group){
   });
   scene.remove(group);
 }
-
-function disposeLogo(){
-  disposeGroup(logoState.group);
-  logoState.group = null;
-}
-
+function disposeLogo(){ disposeGroup(logoState.group); logoState.group = null; }
 function buildLogo(){
   if(!logoState.texture) return;
   disposeLogo();
   const group = new THREE.Group();
   group.userData.fixedLogo = true;
-
-  // Real side shell: invisible front/back, colored four sides.
   const sideMaterial = new THREE.MeshStandardMaterial({ color:'#5a244a', metalness:.45, roughness:.24 });
   const invisible = new THREE.MeshBasicMaterial({ transparent:true, opacity:0, depthWrite:false });
   const shell = new THREE.Mesh(
@@ -215,35 +191,26 @@ function buildLogo(){
   );
   shell.position.z = -logoState.depth/2;
   group.add(shell);
-
-  // Textured slices preserve the PNG silhouette from the front and give visual volume.
   const slices = Math.max(4, Math.round(logoState.depth/2));
   for(let i=slices;i>=1;i--){
     const m = new THREE.MeshBasicMaterial({
-      map:logoState.texture,
-      transparent:true,
-      alphaTest:.03,
-      color:'#6f315d',
-      side:THREE.DoubleSide,
-      depthWrite:true
+      map:logoState.texture, transparent:true, alphaTest:.03, color:'#6f315d',
+      side:THREE.DoubleSide, depthWrite:true
     });
     const layer = new THREE.Mesh(new THREE.PlaneGeometry(logoState.width,logoState.height),m);
     layer.position.z = -i*(logoState.depth/slices);
     group.add(layer);
   }
-
   const front = new THREE.Mesh(
     new THREE.PlaneGeometry(logoState.width,logoState.height),
     new THREE.MeshBasicMaterial({ map:logoState.texture, transparent:true, alphaTest:.03, color:'#ffffff', side:THREE.DoubleSide })
   );
   front.position.z = 1;
   group.add(front);
-
   logoState.group = group;
   scene.add(group);
   applyLogoBase();
 }
-
 function applyLogoBase(){
   if(!logoState.group) return;
   logoState.group.position.set(logoState.x,logoState.y,55);
@@ -254,7 +221,6 @@ const partnerStates = [
   { group:null, texture:null, width:125, height:70, x:310, y:-585 },
   { group:null, texture:null, width:125, height:70, x:445, y:-585 }
 ];
-
 function buildPartnerLogo(index){
   const state = partnerStates[index];
   if(!state.texture) return;
@@ -269,7 +235,6 @@ function buildPartnerLogo(index){
   state.group = group;
   scene.add(group);
 }
-
 function loadImageAsTexture(file, maxW, maxH, onReady){
   const url = URL.createObjectURL(file);
   const image = new Image();
@@ -283,12 +248,10 @@ function loadImageAsTexture(file, maxW, maxH, onReady){
   };
   image.src = url;
 }
-
 function animateObject(obj,cfg,t,isLogo=false){
   if(!obj) return;
   const speed = cfg.animSpeed || 1;
   const amount = cfg.animAmount || 20;
-
   if(isLogo){
     obj.position.set(cfg.x,cfg.y,55);
     obj.rotation.set(0,0,0);
@@ -300,7 +263,6 @@ function animateObject(obj,cfg,t,isLogo=false){
     obj.rotation.z = THREE.MathUtils.degToRad(cfg.rotZ);
     obj.scale.set(cfg.scaleX,cfg.scaleY,1);
   }
-
   if(cfg.animation==='rotateY') obj.rotation.y = t*speed*1.6;
   else if(cfg.animation==='bounce') obj.position.y = cfg.y + Math.abs(Math.sin(t*speed*2.5))*amount;
   else if(cfg.animation==='wave'){
@@ -309,24 +271,49 @@ function animateObject(obj,cfg,t,isLogo=false){
     if(!isLogo) obj.scale.y *= 1 + Math.sin(t*speed*4)*Math.min(amount/500,.14);
   }
 }
-
 function render(){
   const t = clock.getElapsedTime();
-  Object.entries(meshes).forEach(([id,mesh])=>animateObject(mesh,fields[id],t));
+  Object.entries(meshes).forEach(([id,mesh])=>fields[id] && animateObject(mesh,fields[id],t));
   if(logoState.group) animateObject(logoState.group,logoState,t,true);
   renderer.render(scene,camera);
   requestAnimationFrame(render);
 }
 
 const fieldsEl = document.querySelector('#fields');
-Object.entries(fields).forEach(([id,cfg])=>{
+function addFieldButton(id){
+  const cfg = fields[id];
+  if(!cfg) return;
   const b = document.createElement('button');
   b.className='field-btn';
   b.dataset.id=id;
   b.innerHTML=`<span>${cfg.label}</span><span class="field-key">${id}</span>`;
   b.onclick=()=>selectLayer(id);
   fieldsEl.appendChild(b);
-});
+}
+Object.keys(fields).forEach(addFieldButton);
+
+function createDynamicField(type){
+  const isArtist = type === 'artist';
+  const n = isArtist ? ++artistCounter : ++infoCounter;
+  const id = `${type}${Date.now()}${n}`;
+  const rowOffset = ((artistCounter + infoCounter - 1) % 6) * 48;
+  fields[id] = isArtist ? {
+    label:`ARTISTA ${n}`, text:`ARTISTA ${n}`, size:41, depth:14,
+    x:0, y:145-rowOffset, scaleX:1, scaleY:1, rotZ:0, rotX:0,
+    bend:0, bevel:2.5, metalness:.08, roughness:.38, color:'#f5ead8',
+    animation:'none', animSpeed:1, animAmount:18
+  } : {
+    label:`INFO ${n}`, text:`INFO ${n}`, size:24, depth:8,
+    x:0, y:-285-rowOffset, scaleX:1, scaleY:1, rotZ:0, rotX:0,
+    bend:0, bevel:1.5, metalness:.04, roughness:.5, color:'#f5ead8',
+    animation:'none', animSpeed:1, animAmount:12
+  };
+  addFieldButton(id);
+  if(font) rebuild(id);
+  selectLayer(id);
+}
+document.querySelector('#addArtist').addEventListener('click',()=>createDynamicField('artist'));
+document.querySelector('#addInfo').addEventListener('click',()=>createDynamicField('info'));
 
 const controls = {
   text:document.querySelector('#textInput'), size:document.querySelector('#size'), depth:document.querySelector('#depth'),
@@ -335,7 +322,6 @@ const controls = {
   metalness:document.querySelector('#metalness'), roughness:document.querySelector('#roughness'), color:document.querySelector('#color'),
   animation:document.querySelector('#animationType'), animSpeed:document.querySelector('#animSpeed'), animAmount:document.querySelector('#animAmount')
 };
-
 function selectLayer(id){
   if(!fields[id]) return;
   selected=id;
@@ -345,14 +331,18 @@ function selectLayer(id){
 }
 function syncControls(){
   const c=fields[selected];
+  if(!c) return;
   controls.text.value=c.text;
   for(const k of ['size','depth','x','y','scaleX','scaleY','rotZ','rotX','bend','bevel','metalness','roughness','color']) controls[k].value=c[k];
   controls.animation.value=c.animation;
   controls.animSpeed.value=c.animSpeed;
   controls.animAmount.value=c.animAmount;
 }
-function syncXYOnly(){ controls.x.value=fields[selected].x; controls.y.value=fields[selected].y; }
-
+function syncXYOnly(){
+  if(!fields[selected]) return;
+  controls.x.value=fields[selected].x;
+  controls.y.value=fields[selected].y;
+}
 let rebuildTimer;
 function queueRebuild(){ clearTimeout(rebuildTimer); rebuildTimer=setTimeout(()=>rebuild(selected),20); }
 controls.text.addEventListener('input',e=>{ fields[selected].text=e.target.value||' '; queueRebuild(); });
@@ -443,14 +433,12 @@ document.querySelector('#partnerLogo2').addEventListener('change',e=>{
   });
 });
 
-// --- Canvas dragging: text layers only. Fixed logos stay locked. ------------
 const raycaster=new THREE.Raycaster();
 const pointer=new THREE.Vector2();
 const dragPlane=new THREE.Plane(new THREE.Vector3(0,0,1),0);
 const planePoint=new THREE.Vector3();
 const dragOffset=new THREE.Vector3();
 let dragTarget=null;
-
 function setPointerFromEvent(event){
   const rect=renderer.domElement.getBoundingClientRect();
   pointer.x=((event.clientX-rect.left)/rect.width)*2-1;
@@ -506,7 +494,6 @@ function fitStage(){
   renderer.setSize(POSTER_W*s,POSTER_H*s);
 }
 window.addEventListener('resize',fitStage);
-
 function ensureEverythingVisible(){
   Object.keys(fields).forEach(id=>{ clampFieldToPoster(id); applyBaseTransform(id); });
   applyLogoBase();
@@ -525,12 +512,10 @@ document.querySelector('#exportPng').onclick=()=>{
   renderer.setSize(old.x,old.y,false);
   fitStage();
 };
-
 function pickVideoMime(){
   const candidates=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'];
   return candidates.find(type=>window.MediaRecorder?.isTypeSupported?.(type)) || '';
 }
-
 document.querySelector('#exportVideo').onclick=async()=>{
   const button=document.querySelector('#exportVideo');
   if(!renderer.domElement.captureStream || !window.MediaRecorder){
