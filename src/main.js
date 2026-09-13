@@ -7,7 +7,7 @@ const POSTER_W = 1080;
 const POSTER_H = 1350;
 const HALF_W = POSTER_W / 2;
 const HALF_H = POSTER_H / 2;
-const SAFE_MARGIN = 28;
+const SAFE_MARGIN = 42;
 const SCALE = 0.56;
 const VIDEO_DURATION_MS = 6000;
 
@@ -17,7 +17,7 @@ renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.setSize(POSTER_W * SCALE, POSTER_H * SCALE);
 renderer.shadowMap.enabled = true;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.domElement.setAttribute('aria-label', 'Poster canvas: drag text layers');
+renderer.domElement.setAttribute('aria-label', 'Poster canvas: drag text and sketch layers');
 stage.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
@@ -80,12 +80,13 @@ const fields = {
   support2: { label:'SUPPORT 2', text:'ARTIST NAME 2', size:41, depth:14, x:0, y:5, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:-.08, bevel:2.5, metalness:.05, roughness:.4, color:'#f5ead8', animation:'none', animSpeed:1, animAmount:18 },
   venue: { label:'VENUE', text:'CLUB NAME', size:46, depth:16, x:0, y:-155, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:.15, bevel:3, metalness:.15, roughness:.28, color:'#ff4a1a', animation:'none', animSpeed:1, animAmount:18 },
   address: { label:'ADDRESS', text:'VIA INDIRIZZO, CITTÀ', size:22, depth:8, x:0, y:-255, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:.12, bevel:1.5, metalness:.1, roughness:.45, color:'#ff4a1a', animation:'none', animSpeed:1, animAmount:14 },
-  date: { label:'DATE', text:'DAY 00 MONTH', size:51, depth:18, x:0, y:-405, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:-.12, bevel:3, metalness:.25, roughness:.25, color:'#b77cff', animation:'none', animSpeed:1, animAmount:18 },
-  time: { label:'TIME', text:'00:00 — 00:00', size:27, depth:10, x:0, y:-520, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:1.5, metalness:.05, roughness:.4, color:'#f5ead8', animation:'none', animSpeed:1, animAmount:14 }
+  date: { label:'DATE', text:'DAY 00 MONTH', size:51, depth:18, x:-130, y:-405, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:-.12, bevel:3, metalness:.25, roughness:.25, color:'#b77cff', animation:'none', animSpeed:1, animAmount:18 },
+  time: { label:'TIME', text:'00:00 — 00:00', size:27, depth:10, x:-130, y:-520, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:1.5, metalness:.05, roughness:.4, color:'#f5ead8', animation:'none', animSpeed:1, animAmount:14 }
 };
 
 let artistCounter = 0;
 let infoCounter = 0;
+let sketchCounter = 0;
 let font;
 const meshes = {};
 let selected = 'guest';
@@ -94,9 +95,13 @@ const clock = new THREE.Clock();
 function makeMaterial(cfg){
   return new THREE.MeshStandardMaterial({ color: cfg.color, metalness: cfg.metalness, roughness: cfg.roughness });
 }
+
 function buildGeometry(cfg){
   const g = new TextGeometry(cfg.text, {
-    font, size: cfg.size, depth: cfg.depth, curveSegments: 10,
+    font,
+    size: cfg.size,
+    depth: cfg.depth,
+    curveSegments: 10,
     bevelEnabled: cfg.bevel > 0,
     bevelThickness: cfg.bevel * .65,
     bevelSize: cfg.bevel,
@@ -119,6 +124,7 @@ function buildGeometry(cfg){
   g.computeBoundingBox();
   return g;
 }
+
 function getTextHalfExtents(id){
   const mesh = meshes[id];
   if(!mesh || !mesh.geometry.boundingBox) return { x:40, y:20 };
@@ -128,6 +134,7 @@ function getTextHalfExtents(id){
     y:Math.max(10,(bb.max.y-bb.min.y)*Math.abs(fields[id].scaleY)/2)
   };
 }
+
 function clampFieldToPoster(id){
   const cfg = fields[id];
   const e = getTextHalfExtents(id);
@@ -136,6 +143,7 @@ function clampFieldToPoster(id){
   cfg.x = THREE.MathUtils.clamp(cfg.x,-maxX,maxX);
   cfg.y = THREE.MathUtils.clamp(cfg.y,-maxY,maxY);
 }
+
 function rebuild(id){
   if(!font || !fields[id]) return;
   const cfg = fields[id];
@@ -154,6 +162,7 @@ function rebuild(id){
   clampFieldToPoster(id);
   applyBaseTransform(id);
 }
+
 function applyBaseTransform(id){
   const cfg = fields[id];
   const mesh = meshes[id];
@@ -162,12 +171,23 @@ function applyBaseTransform(id){
   mesh.rotation.set(THREE.MathUtils.degToRad(cfg.rotX),0,THREE.MathUtils.degToRad(cfg.rotZ));
   mesh.scale.set(cfg.scaleX,cfg.scaleY,1);
 }
+
 function rebuildAll(){ Object.keys(fields).forEach(rebuild); }
 
 const logoState = {
-  group:null, texture:null, width:480, height:190, depth:28, scale:1,
-  x:0, y:475, animation:'none', animSpeed:1, animAmount:20
+  group:null,
+  texture:null,
+  width:480,
+  height:190,
+  depth:28,
+  scale:1,
+  x:0,
+  y:455,
+  animation:'none',
+  animSpeed:1,
+  animAmount:20
 };
+
 function disposeGroup(group){
   if(!group) return;
   group.traverse(o=>{
@@ -177,12 +197,18 @@ function disposeGroup(group){
   });
   scene.remove(group);
 }
-function disposeLogo(){ disposeGroup(logoState.group); logoState.group = null; }
+
+function disposeLogo(){
+  disposeGroup(logoState.group);
+  logoState.group = null;
+}
+
 function buildLogo(){
   if(!logoState.texture) return;
   disposeLogo();
   const group = new THREE.Group();
   group.userData.fixedLogo = true;
+
   const sideMaterial = new THREE.MeshStandardMaterial({ color:'#5a244a', metalness:.45, roughness:.24 });
   const invisible = new THREE.MeshBasicMaterial({ transparent:true, opacity:0, depthWrite:false });
   const shell = new THREE.Mesh(
@@ -191,36 +217,46 @@ function buildLogo(){
   );
   shell.position.z = -logoState.depth/2;
   group.add(shell);
+
   const slices = Math.max(4, Math.round(logoState.depth/2));
   for(let i=slices;i>=1;i--){
     const m = new THREE.MeshBasicMaterial({
-      map:logoState.texture, transparent:true, alphaTest:.03, color:'#6f315d',
-      side:THREE.DoubleSide, depthWrite:true
+      map:logoState.texture,
+      transparent:true,
+      alphaTest:.03,
+      color:'#6f315d',
+      side:THREE.DoubleSide,
+      depthWrite:true
     });
     const layer = new THREE.Mesh(new THREE.PlaneGeometry(logoState.width,logoState.height),m);
     layer.position.z = -i*(logoState.depth/slices);
     group.add(layer);
   }
+
   const front = new THREE.Mesh(
     new THREE.PlaneGeometry(logoState.width,logoState.height),
     new THREE.MeshBasicMaterial({ map:logoState.texture, transparent:true, alphaTest:.03, color:'#ffffff', side:THREE.DoubleSide })
   );
   front.position.z = 1;
   group.add(front);
+
   logoState.group = group;
   scene.add(group);
   applyLogoBase();
 }
+
 function applyLogoBase(){
   if(!logoState.group) return;
   logoState.group.position.set(logoState.x,logoState.y,55);
   logoState.group.scale.setScalar(logoState.scale);
 }
 
+// Keep these clearly inside the perspective-safe part of the poster.
 const partnerStates = [
-  { group:null, texture:null, width:125, height:70, x:310, y:-585 },
-  { group:null, texture:null, width:125, height:70, x:445, y:-585 }
+  { group:null, texture:null, width:115, height:64, x:300, y:-515 },
+  { group:null, texture:null, width:115, height:64, x:425, y:-515 }
 ];
+
 function buildPartnerLogo(index){
   const state = partnerStates[index];
   if(!state.texture) return;
@@ -228,13 +264,22 @@ function buildPartnerLogo(index){
   const group = new THREE.Group();
   const mesh = new THREE.Mesh(
     new THREE.PlaneGeometry(state.width,state.height),
-    new THREE.MeshBasicMaterial({ map:state.texture, transparent:true, alphaTest:.03, side:THREE.DoubleSide })
+    new THREE.MeshBasicMaterial({
+      map:state.texture,
+      transparent:true,
+      alphaTest:.02,
+      side:THREE.DoubleSide,
+      depthTest:false
+    })
   );
+  mesh.renderOrder = 50;
   group.add(mesh);
-  group.position.set(state.x,state.y,30);
+  group.position.set(state.x,state.y,80);
+  group.renderOrder = 50;
   state.group = group;
   scene.add(group);
 }
+
 function loadImageAsTexture(file, maxW, maxH, onReady){
   const url = URL.createObjectURL(file);
   const image = new Image();
@@ -248,6 +293,81 @@ function loadImageAsTexture(file, maxW, maxH, onReady){
   };
   image.src = url;
 }
+
+const sketchStates = [];
+const sketchList = document.querySelector('#sketchList');
+
+function clampImageState(state){
+  const hw = Math.min(state.width * state.scale / 2, HALF_W - SAFE_MARGIN);
+  const hh = Math.min(state.height * state.scale / 2, HALF_H - SAFE_MARGIN);
+  state.x = THREE.MathUtils.clamp(state.x, -HALF_W + SAFE_MARGIN + hw, HALF_W - SAFE_MARGIN - hw);
+  state.y = THREE.MathUtils.clamp(state.y, -HALF_H + SAFE_MARGIN + hh, HALF_H - SAFE_MARGIN - hh);
+}
+
+function buildSketch(state){
+  if(state.group) disposeGroup(state.group);
+  const group = new THREE.Group();
+  group.userData.sketchId = state.id;
+  const mesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(state.width,state.height),
+    new THREE.MeshBasicMaterial({
+      map:state.texture,
+      transparent:true,
+      alphaTest:.01,
+      side:THREE.DoubleSide,
+      depthTest:false
+    })
+  );
+  mesh.userData.sketchId = state.id;
+  mesh.renderOrder = 35;
+  group.add(mesh);
+  state.group = group;
+  clampImageState(state);
+  group.position.set(state.x,state.y,65);
+  group.scale.setScalar(state.scale);
+  scene.add(group);
+}
+
+function addSketchListItem(state){
+  const row = document.createElement('div');
+  row.className = 'sketch-item';
+  row.dataset.sketchId = state.id;
+  row.innerHTML = `<span>${state.name}</span><button type="button" title="Remove sketch">×</button>`;
+  row.querySelector('button').onclick = ()=>{
+    if(state.group) disposeGroup(state.group);
+    if(state.texture) state.texture.dispose();
+    const idx = sketchStates.findIndex(s=>s.id===state.id);
+    if(idx >= 0) sketchStates.splice(idx,1);
+    row.remove();
+  };
+  sketchList.appendChild(row);
+}
+
+function addSketchFile(file){
+  loadImageAsTexture(file,360,360,({texture,width,height})=>{
+    const index = sketchCounter++;
+    const state = {
+      id:`sketch-${Date.now()}-${index}`,
+      name:file.name || `Sketch ${index+1}`,
+      texture,
+      width,
+      height,
+      scale:1,
+      x:-280 + (index % 3) * 120,
+      y:160 - (index % 4) * 95,
+      group:null
+    };
+    sketchStates.push(state);
+    buildSketch(state);
+    addSketchListItem(state);
+  });
+}
+
+document.querySelector('#sketchUpload').addEventListener('change',e=>{
+  [...(e.target.files || [])].forEach(addSketchFile);
+  e.target.value='';
+});
+
 function animateObject(obj,cfg,t,isLogo=false){
   if(!obj) return;
   const speed = cfg.animSpeed || 1;
@@ -271,6 +391,7 @@ function animateObject(obj,cfg,t,isLogo=false){
     if(!isLogo) obj.scale.y *= 1 + Math.sin(t*speed*4)*Math.min(amount/500,.14);
   }
 }
+
 function render(){
   const t = clock.getElapsedTime();
   Object.entries(meshes).forEach(([id,mesh])=>fields[id] && animateObject(mesh,fields[id],t));
@@ -322,6 +443,7 @@ const controls = {
   metalness:document.querySelector('#metalness'), roughness:document.querySelector('#roughness'), color:document.querySelector('#color'),
   animation:document.querySelector('#animationType'), animSpeed:document.querySelector('#animSpeed'), animAmount:document.querySelector('#animAmount')
 };
+
 function selectLayer(id){
   if(!fields[id]) return;
   selected=id;
@@ -329,6 +451,7 @@ function selectLayer(id){
   document.querySelectorAll('.field-btn').forEach(b=>b.classList.toggle('active',b.dataset.id===id));
   syncControls();
 }
+
 function syncControls(){
   const c=fields[selected];
   if(!c) return;
@@ -338,11 +461,13 @@ function syncControls(){
   controls.animSpeed.value=c.animSpeed;
   controls.animAmount.value=c.animAmount;
 }
+
 function syncXYOnly(){
   if(!fields[selected]) return;
   controls.x.value=fields[selected].x;
   controls.y.value=fields[selected].y;
 }
+
 let rebuildTimer;
 function queueRebuild(){ clearTimeout(rebuildTimer); rebuildTimer=setTimeout(()=>rebuild(selected),20); }
 controls.text.addEventListener('input',e=>{ fields[selected].text=e.target.value||' '; queueRebuild(); });
@@ -411,76 +536,119 @@ logoUpload.addEventListener('change',e=>{
   const file=e.target.files?.[0]; if(!file) return;
   loadImageAsTexture(file,520,230,({texture,width,height})=>{
     if(logoState.texture) logoState.texture.dispose();
-    logoState.texture=texture; logoState.width=width; logoState.height=height; buildLogo();
+    logoState.texture=texture;
+    logoState.width=width;
+    logoState.height=height;
+    buildLogo();
   });
 });
 logoDepth.addEventListener('input',e=>{ logoState.depth=Number(e.target.value); buildLogo(); });
 logoScale.addEventListener('input',e=>{ logoState.scale=Number(e.target.value); applyLogoBase(); });
 logoAnimation.addEventListener('change',e=>logoState.animation=e.target.value);
 
-document.querySelector('#partnerLogo1').addEventListener('change',e=>{
-  const file=e.target.files?.[0]; if(!file) return;
-  loadImageAsTexture(file,125,70,({texture,width,height})=>{
-    if(partnerStates[0].texture) partnerStates[0].texture.dispose();
-    Object.assign(partnerStates[0],{texture,width,height}); buildPartnerLogo(0);
+function setupPartnerUpload(selector,index){
+  document.querySelector(selector).addEventListener('change',e=>{
+    const file=e.target.files?.[0];
+    if(!file) return;
+    loadImageAsTexture(file,115,64,({texture,width,height})=>{
+      const state=partnerStates[index];
+      if(state.texture) state.texture.dispose();
+      Object.assign(state,{texture,width,height});
+      buildPartnerLogo(index);
+    });
   });
-});
-document.querySelector('#partnerLogo2').addEventListener('change',e=>{
-  const file=e.target.files?.[0]; if(!file) return;
-  loadImageAsTexture(file,125,70,({texture,width,height})=>{
-    if(partnerStates[1].texture) partnerStates[1].texture.dispose();
-    Object.assign(partnerStates[1],{texture,width,height}); buildPartnerLogo(1);
-  });
-});
+}
+setupPartnerUpload('#partnerLogo1',0);
+setupPartnerUpload('#partnerLogo2',1);
 
+// --- Canvas dragging for text + sketch PNGs -------------------------------
 const raycaster=new THREE.Raycaster();
 const pointer=new THREE.Vector2();
 const dragPlane=new THREE.Plane(new THREE.Vector3(0,0,1),0);
 const planePoint=new THREE.Vector3();
 const dragOffset=new THREE.Vector3();
 let dragTarget=null;
+
 function setPointerFromEvent(event){
   const rect=renderer.domElement.getBoundingClientRect();
   pointer.x=((event.clientX-rect.left)/rect.width)*2-1;
   pointer.y=-((event.clientY-rect.top)/rect.height)*2+1;
   raycaster.setFromCamera(pointer,camera);
 }
-function findTextHit(event){
+
+function findInteractiveHit(event){
   setPointerFromEvent(event);
-  const hits=raycaster.intersectObjects(Object.values(meshes),false);
-  return hits.length && hits[0].object.userData.layerId ? hits[0].object.userData.layerId : null;
+  const textHits=raycaster.intersectObjects(Object.values(meshes),false);
+  if(textHits.length && textHits[0].object.userData.layerId){
+    return { type:'text', id:textHits[0].object.userData.layerId };
+  }
+  const sketchMeshes=sketchStates.flatMap(s=>s.group ? s.group.children : []);
+  const sketchHits=raycaster.intersectObjects(sketchMeshes,false);
+  if(sketchHits.length){
+    const id=sketchHits[0].object.userData.sketchId || sketchHits[0].object.parent?.userData.sketchId;
+    const state=sketchStates.find(s=>s.id===id);
+    if(state) return { type:'sketch', state };
+  }
+  return null;
 }
-function intersectDragPlane(event){
+
+function intersectDragPlane(event,z=0){
   setPointerFromEvent(event);
-  dragPlane.constant=0;
+  dragPlane.constant=-z;
   return raycaster.ray.intersectPlane(dragPlane,planePoint)?planePoint.clone():null;
 }
+
 renderer.domElement.addEventListener('pointerdown',event=>{
   if(event.button!==0) return;
-  const id=findTextHit(event); if(!id) return;
-  const p=intersectDragPlane(event); if(!p) return;
-  dragTarget=id;
-  dragOffset.set(fields[id].x-p.x,fields[id].y-p.y,0);
-  selectLayer(id);
+  const hit=findInteractiveHit(event);
+  if(!hit) return;
+  const z=hit.type==='sketch'?65:0;
+  const p=intersectDragPlane(event,z);
+  if(!p) return;
+  dragTarget=hit;
+  if(hit.type==='text'){
+    dragOffset.set(fields[hit.id].x-p.x,fields[hit.id].y-p.y,0);
+    selectLayer(hit.id);
+  } else {
+    dragOffset.set(hit.state.x-p.x,hit.state.y-p.y,0);
+  }
   renderer.domElement.setPointerCapture(event.pointerId);
   renderer.domElement.classList.add('is-dragging');
   event.preventDefault();
 });
+
 renderer.domElement.addEventListener('pointermove',event=>{
-  if(!dragTarget){ renderer.domElement.classList.toggle('can-drag',Boolean(findTextHit(event))); return; }
-  const p=intersectDragPlane(event); if(!p) return;
-  fields[dragTarget].x=p.x+dragOffset.x;
-  fields[dragTarget].y=p.y+dragOffset.y;
-  clampFieldToPoster(dragTarget);
-  applyBaseTransform(dragTarget);
-  if(selected===dragTarget) syncXYOnly();
+  if(!dragTarget){
+    renderer.domElement.classList.toggle('can-drag',Boolean(findInteractiveHit(event)));
+    return;
+  }
+  const z=dragTarget.type==='sketch'?65:0;
+  const p=intersectDragPlane(event,z);
+  if(!p) return;
+  if(dragTarget.type==='text'){
+    const id=dragTarget.id;
+    fields[id].x=p.x+dragOffset.x;
+    fields[id].y=p.y+dragOffset.y;
+    clampFieldToPoster(id);
+    applyBaseTransform(id);
+    if(selected===id) syncXYOnly();
+  } else {
+    const state=dragTarget.state;
+    state.x=p.x+dragOffset.x;
+    state.y=p.y+dragOffset.y;
+    clampImageState(state);
+    state.group.position.set(state.x,state.y,65);
+  }
   event.preventDefault();
 });
+
 function stopDragging(event){
   if(!dragTarget) return;
   dragTarget=null;
   renderer.domElement.classList.remove('is-dragging');
-  if(event?.pointerId!=null && renderer.domElement.hasPointerCapture(event.pointerId)) renderer.domElement.releasePointerCapture(event.pointerId);
+  if(event?.pointerId!=null && renderer.domElement.hasPointerCapture(event.pointerId)){
+    renderer.domElement.releasePointerCapture(event.pointerId);
+  }
 }
 renderer.domElement.addEventListener('pointerup',stopDragging);
 renderer.domElement.addEventListener('pointercancel',stopDragging);
@@ -494,10 +662,22 @@ function fitStage(){
   renderer.setSize(POSTER_W*s,POSTER_H*s);
 }
 window.addEventListener('resize',fitStage);
+
 function ensureEverythingVisible(){
   Object.keys(fields).forEach(id=>{ clampFieldToPoster(id); applyBaseTransform(id); });
   applyLogoBase();
-  partnerStates.forEach(s=>{ if(s.group) s.group.position.set(s.x,s.y,30); });
+  partnerStates.forEach((s,i)=>{
+    if(s.group){
+      const defaults=i===0?{x:300,y:-515}:{x:425,y:-515};
+      s.x=defaults.x;
+      s.y=defaults.y;
+      s.group.position.set(s.x,s.y,80);
+    }
+  });
+  sketchStates.forEach(state=>{
+    clampImageState(state);
+    if(state.group) state.group.position.set(state.x,state.y,65);
+  });
 }
 
 document.querySelector('#exportPng').onclick=()=>{
@@ -512,10 +692,12 @@ document.querySelector('#exportPng').onclick=()=>{
   renderer.setSize(old.x,old.y,false);
   fitStage();
 };
+
 function pickVideoMime(){
   const candidates=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'];
   return candidates.find(type=>window.MediaRecorder?.isTypeSupported?.(type)) || '';
 }
+
 document.querySelector('#exportVideo').onclick=async()=>{
   const button=document.querySelector('#exportVideo');
   if(!renderer.domElement.captureStream || !window.MediaRecorder){
