@@ -18,6 +18,7 @@ button:disabled{opacity:.45;cursor:wait}
 .panel-right{border-left:1px solid #342631}
 .brand{font-weight:800;font-size:13px;letter-spacing:.06em;margin-bottom:18px}
 .section-block{margin-top:22px;padding-top:18px;border-top:1px solid #342631}
+.add-layer-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
 .field-btn{
   width:100%;text-align:left;margin-bottom:6px;padding:10px 12px;
   display:flex;justify-content:space-between;gap:12px
@@ -56,6 +57,21 @@ textarea{resize:vertical}
 .three-colors{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
 .file-input{width:100%;font-size:11px;color:#cfc3ca;margin:8px 0 6px}
 .file-input::file-selector-button{border:1px solid #5c4b57;background:#171116;color:#fff;padding:7px 9px;margin-right:8px;border-radius:6px;cursor:pointer}
+.file-input-hidden{display:none}
+.upload-button{
+  display:inline-flex;align-items:center;justify-content:center;
+  border:1px solid #7d4566;background:#25131f;color:#fff;
+  padding:9px 11px;border-radius:6px;cursor:pointer;margin:0 0 8px
+}
+.upload-button:hover{background:#351828}
+.sketch-list{display:grid;gap:6px;margin-top:8px}
+.sketch-item{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  min-width:0;padding:7px 8px;border:1px solid #40303b;border-radius:6px;background:#0e0b0d;
+  font-size:10px;color:#cfc3ca
+}
+.sketch-item span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sketch-item button{padding:2px 7px;min-width:28px}
 .fixed-note{font-size:10px;line-height:1.45;color:#9e8f98;margin-top:8px;padding:8px 10px;border:1px dashed #4d3947;border-radius:6px;background:#0e0b0d}
 @media(max-width:1050px){
   #app{grid-template-columns:240px 1fr 280px}
