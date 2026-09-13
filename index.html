@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>More Amore Poster Generator</title>
+  </head>
+  <body>
+    <div id="app">
+      <aside class="panel panel-left">
+        <div class="brand">MORE AMORE / POSTER GENERATOR</div>
+        <div id="fields"></div>
+      </aside>
+
+      <main class="stage-wrap">
+        <div class="toolbar">
+          <button id="presetClassic">CLASSIC</button>
+          <button id="presetChrome">CHROME</button>
+          <button id="presetWarp">WARP</button>
+          <button id="exportPng">EXPORT PNG</button>
+        </div>
+        <div id="stage"></div>
+      </main>
+
+      <aside class="panel panel-right">
+        <div class="section-title">SELECTED LAYER</div>
+        <div id="selectedName" class="selected-name">—</div>
+
+        <label>Text<textarea id="textInput" rows="2"></textarea></label>
+
+        <div class="two">
+          <label>Size<input id="size" type="range" min="20" max="260" step="1"></label>
+          <label>Depth<input id="depth" type="range" min="0" max="80" step="1"></label>
+        </div>
+
+        <div class="two">
+          <label>X<input id="x" type="range" min="-500" max="500" step="1"></label>
+          <label>Y<input id="y" type="range" min="-800" max="800" step="1"></label>
+        </div>
+
+        <div class="two">
+          <label>Scale X<input id="scaleX" type="range" min="0.2" max="2.5" step="0.01"></label>
+          <label>Scale Y<input id="scaleY" type="range" min="0.2" max="2.5" step="0.01"></label>
+        </div>
+
+        <div class="two">
+          <label>Rotate Z<input id="rotZ" type="range" min="-45" max="45" step="0.1"></label>
+          <label>Rotate X<input id="rotX" type="range" min="-55" max="55" step="0.1"></label>
+        </div>
+
+        <label>Bend<input id="bend" type="range" min="-1.5" max="1.5" step="0.01"></label>
+
+        <div class="two">
+          <label>Bevel<input id="bevel" type="range" min="0" max="16" step="0.5"></label>
+          <label>Metal<input id="metalness" type="range" min="0" max="1" step="0.01"></label>
+        </div>
+
+        <div class="two">
+          <label>Rough<input id="roughness" type="range" min="0" max="1" step="0.01"></label>
+          <label>Color<input id="color" type="color"></label>
+        </div>
+
+        <div class="fx-row">
+          <button data-fx="plastic">PLASTIC</button>
+          <button data-fx="chrome">CHROME</button>
+          <button data-fx="cream">CREAM</button>
+        </div>
+      </aside>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
