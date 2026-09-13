@@ -9,7 +9,45 @@
     <div id="app">
       <aside class="panel panel-left">
         <div class="brand">MORE AMORE / POSTER GENERATOR</div>
+        <div class="section-title">TEXT LAYERS</div>
         <div id="fields"></div>
+
+        <div class="section-block">
+          <div class="section-title">BACKGROUND</div>
+          <div class="palette-row">
+            <button class="palette" data-palette="amore">AMORE</button>
+            <button class="palette" data-palette="acid">ACID</button>
+            <button class="palette" data-palette="night">NIGHT</button>
+            <button class="palette" data-palette="sunset">SUNSET</button>
+          </div>
+          <div class="three-colors">
+            <input id="bg1" type="color" value="#240812">
+            <input id="bg2" type="color" value="#6d173b">
+            <input id="bg3" type="color" value="#b77cff">
+          </div>
+          <label>Gradient angle<input id="bgAngle" type="range" min="0" max="360" value="135"></label>
+        </div>
+
+        <div class="section-block">
+          <div class="section-title">PNG LOGO</div>
+          <input id="logoUpload" class="file-input" type="file" accept="image/png,image/webp">
+          <div class="two">
+            <label>Depth<input id="logoDepth" type="range" min="0" max="60" value="18"></label>
+            <label>Scale<input id="logoScale" type="range" min="0.2" max="2" step="0.01" value="1"></label>
+          </div>
+          <div class="two">
+            <label>X<input id="logoX" type="range" min="-500" max="500" value="0"></label>
+            <label>Y<input id="logoY" type="range" min="-650" max="650" value="510"></label>
+          </div>
+          <label>Logo animation
+            <select id="logoAnimation">
+              <option value="none">None</option>
+              <option value="rotateY">Rotate Y</option>
+              <option value="bounce">Bounce</option>
+              <option value="wave">Wave</option>
+            </select>
+          </label>
+        </div>
       </aside>
 
       <main class="stage-wrap">
@@ -29,7 +67,7 @@
         <label>Text<textarea id="textInput" rows="2"></textarea></label>
 
         <div class="two">
-          <label>Size<input id="size" type="range" min="20" max="260" step="1"></label>
+          <label>Size<input id="size" type="range" min="10" max="180" step="1"></label>
           <label>Depth<input id="depth" type="range" min="0" max="80" step="1"></label>
         </div>
 
@@ -64,6 +102,22 @@
           <button data-fx="plastic">PLASTIC</button>
           <button data-fx="chrome">CHROME</button>
           <button data-fx="cream">CREAM</button>
+        </div>
+
+        <div class="section-block">
+          <div class="section-title">ANIMATION</div>
+          <label>Type
+            <select id="animationType">
+              <option value="none">None</option>
+              <option value="rotateY">Rotate Y</option>
+              <option value="bounce">Bounce</option>
+              <option value="wave">Wave</option>
+            </select>
+          </label>
+          <div class="two">
+            <label>Speed<input id="animSpeed" type="range" min="0.1" max="4" step="0.1"></label>
+            <label>Amount<input id="animAmount" type="range" min="1" max="80" step="1"></label>
+          </div>
         </div>
       </aside>
     </div>
