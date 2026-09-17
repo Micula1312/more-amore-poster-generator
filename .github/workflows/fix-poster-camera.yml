@@ -1,0 +1,32 @@
+name: Fix poster camera framing
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-poster-camera.yml'
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix camera to frame the full 1080x1350 poster
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('src/main.js')
+          s=p.read_text()
+          s=s.replace("camera.position.set(0, 0, 1850);", "camera.position.set(0, 0, 2707);")
+          s=s.replace("bg.position.z=-180;", "bg.position.z=-1;")
+          # Keep bottom-left reference block comfortably inside the safe margin.
+          s=s.replace("date:{label:'DATE',text:'DAY 00 MONTH',size:30,depth:12,x:-300,y:-480", "date:{label:'DATE',text:'DAY 00 MONTH',size:30,depth:12,x:-300,y:-490")
+          s=s.replace("time:{label:'TIME',text:'00:00 — 00:00',size:20,depth:7,x:-300,y:-550", "time:{label:'TIME',text:'23:00 — TILL LATE',size:20,depth:7,x:-300,y:-555")
+          p.write_text(s)
+          PY
+      - name: Commit fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/main.js
+          git commit -m "Frame full poster and restore date time block" || exit 0
+          git push
