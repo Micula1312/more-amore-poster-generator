@@ -22,14 +22,14 @@ stage.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(28, POSTER_W / POSTER_H, 1, 5000);
-camera.position.set(0, 0, 1850);
+camera.position.set(0, 0, 2707);
 scene.add(new THREE.AmbientLight(0xffffff, 1.55));
 const key = new THREE.DirectionalLight(0xfff2df, 4.2); key.position.set(-300,420,900); scene.add(key);
 const rim = new THREE.DirectionalLight(0xff48c4,3.2); rim.position.set(600,-180,700); scene.add(rim);
 
 const bgCanvas=document.createElement('canvas'); bgCanvas.width=POSTER_W; bgCanvas.height=POSTER_H;
 const bgTexture=new THREE.CanvasTexture(bgCanvas); bgTexture.colorSpace=THREE.SRGBColorSpace;
-const bg=new THREE.Mesh(new THREE.PlaneGeometry(POSTER_W,POSTER_H),new THREE.MeshBasicMaterial({map:bgTexture})); bg.position.z=-180; bg.userData.nonInteractive=true; scene.add(bg);
+const bg=new THREE.Mesh(new THREE.PlaneGeometry(POSTER_W,POSTER_H),new THREE.MeshBasicMaterial({map:bgTexture})); bg.position.z=-1; bg.userData.nonInteractive=true; scene.add(bg);
 const palettes={amore:['#240812','#6d173b','#b77cff'],acid:['#08170d','#31ff70','#fb38ff'],night:['#03020a','#1b1456','#215dff'],sunset:['#32101d','#ff4a1a','#ffb65c']};
 const bgState={colors:[...palettes.amore],angle:135};
 function updateBackground(){const ctx=bgCanvas.getContext('2d'),rad=THREE.MathUtils.degToRad(bgState.angle),cx=bgCanvas.width/2,cy=bgCanvas.height/2,len=Math.hypot(bgCanvas.width,bgCanvas.height)/2;const grad=ctx.createLinearGradient(cx-Math.cos(rad)*len,cy-Math.sin(rad)*len,cx+Math.cos(rad)*len,cy+Math.sin(rad)*len);grad.addColorStop(0,bgState.colors[0]);grad.addColorStop(.52,bgState.colors[1]);grad.addColorStop(1,bgState.colors[2]);ctx.fillStyle=grad;ctx.fillRect(0,0,bgCanvas.width,bgCanvas.height);bgTexture.needsUpdate=true;} updateBackground();
@@ -41,8 +41,8 @@ const fields={
  support2:{label:'SUPPORT 2',text:'OLIVIA',size:34,depth:12,x:0,y:25,scaleX:1,scaleY:1,rotZ:0,rotX:0,bend:0,bevel:2.5,metalness:.05,roughness:.4,color:'#f5ead8',animation:'none',animSpeed:1,animAmount:18},
  venue:{label:'VENUE',text:'CLUB NAME',size:40,depth:14,x:0,y:-145,scaleX:1,scaleY:1,rotZ:0,rotX:0,bend:0,bevel:3,metalness:.15,roughness:.28,color:'#ff4a1a',animation:'none',animSpeed:1,animAmount:18},
  address:{label:'ADDRESS',text:'VIA INDIRIZZO, CITTÀ',size:20,depth:7,x:0,y:-235,scaleX:1,scaleY:1,rotZ:0,rotX:0,bend:0,bevel:1.5,metalness:.1,roughness:.45,color:'#ff4a1a',animation:'none',animSpeed:1,animAmount:14},
- date:{label:'DATE',text:'DAY 00 MONTH',size:30,depth:12,x:-300,y:-480,scaleX:1,scaleY:1,rotZ:0,rotX:0,bend:0,bevel:2.5,metalness:.2,roughness:.28,color:'#b77cff',animation:'none',animSpeed:1,animAmount:16},
- time:{label:'TIME',text:'00:00 — 00:00',size:20,depth:7,x:-300,y:-550,scaleX:1,scaleY:1,rotZ:0,rotX:0,bend:0,bevel:1.5,metalness:.05,roughness:.4,color:'#f5ead8',animation:'none',animSpeed:1,animAmount:12}
+ date:{label:'DATE',text:'DAY 00 MONTH',size:30,depth:12,x:-300,y:-490,scaleX:1,scaleY:1,rotZ:0,rotX:0,bend:0,bevel:2.5,metalness:.2,roughness:.28,color:'#b77cff',animation:'none',animSpeed:1,animAmount:16},
+ time:{label:'TIME',text:'23:00 — TILL LATE',size:20,depth:7,x:-300,y:-555,scaleX:1,scaleY:1,rotZ:0,rotX:0,bend:0,bevel:1.5,metalness:.05,roughness:.4,color:'#f5ead8',animation:'none',animSpeed:1,animAmount:12}
 };
 
 let artistCounter=0,infoCounter=0,sketchCounter=0,font; const meshes={}; let selected='guest'; const clock=new THREE.Clock();
