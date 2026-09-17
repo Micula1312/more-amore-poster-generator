@@ -15,8 +15,8 @@ if (stage) {
     objectPosition: 'center center',
     display: 'block',
     zIndex: '200',
-    transform: 'translateX(-50%)',
-    transformOrigin: 'top center',
+    transform: 'translate(-50%, -50%)',
+    transformOrigin: 'center center',
     opacity: '1'
   });
 
@@ -29,27 +29,27 @@ if (stage) {
     const canvasRect = canvas.getBoundingClientRect();
     const left = canvasRect.left - stageRect.left;
     const top = canvasRect.top - stageRect.top;
+    const safeX = canvasRect.width * 0.075;
+    const safeY = canvasRect.height * 0.065;
+    const logoBandHeight = canvasRect.height * 0.13;
 
-    // Keep the complete PNG safely inside the top of the poster.
+    // Fixed header band inside the same safe margin used by the poster content.
     logo.style.left = `${left + canvasRect.width / 2}px`;
-    logo.style.top = `${top + canvasRect.height * 0.025}px`;
-    logo.style.width = `${canvasRect.width * 0.46}px`;
+    logo.style.top = `${top + safeY + logoBandHeight / 2}px`;
+    logo.style.width = `${Math.min(canvasRect.width * 0.46, canvasRect.width - safeX * 2)}px`;
     logo.style.height = 'auto';
-    logo.style.maxHeight = `${canvasRect.height * 0.15}px`;
+    logo.style.maxHeight = `${logoBandHeight}px`;
   }
 
   const observer = new ResizeObserver(syncLogoToCanvas);
   observer.observe(stage);
   window.addEventListener('resize', syncLogoToCanvas);
-  logo.addEventListener('load', () => {
-    logo.style.visibility = 'visible';
-    syncLogoToCanvas();
-  });
+  logo.addEventListener('load', syncLogoToCanvas);
   requestAnimationFrame(syncLogoToCanvas);
   setTimeout(syncLogoToCanvas, 250);
   setTimeout(syncLogoToCanvas, 700);
 
-  // A custom main logo replaces the preset logo.
+  // A custom main logo replaces the preset logo. Its Three.js slot uses the same header area.
   document.querySelector('#logoUpload')?.addEventListener('change', e => {
     logo.style.display = e.target.files?.[0] ? 'none' : 'block';
   });
