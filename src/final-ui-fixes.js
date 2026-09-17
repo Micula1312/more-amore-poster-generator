@@ -1,26 +1,16 @@
-// Final UI fixes: keep partner logos DOM-only, add an 8-color digital palette.
-const stage = document.querySelector('#stage');
-const partnerInputs = [document.querySelector('#partnerLogo1'), document.querySelector('#partnerLogo2')];
-
-// main.js also listens to partner inputs and creates Three.js planes. Stop those handlers:
-// partner-overlay.js remains the single visual source for the two fixed bottom-right logos.
-partnerInputs.forEach(input => {
-  if (!input) return;
-  input.addEventListener('change', e => e.stopImmediatePropagation(), true);
-});
-
-// Remove any legacy Three.js partner-logo meshes that may already exist after a change.
-// The DOM overlay is intentionally the only partner-logo renderer in the editor.
+// Final UI fixes: add an 8-color digital palette.
+// Partner logo uploads are intentionally NOT intercepted here.
+// partner-overlay.js is the single renderer for the two fixed bottom-right logos.
 
 const DIGITAL_COLORS = [
-  '#ff2aa1', // hyper pink
-  '#ff4a1a', // digital orange
-  '#d8ff00', // acid lime
-  '#31ff70', // signal green
-  '#00e5ff', // cyan
-  '#1677ff', // electric blue
-  '#b77cff', // ultraviolet
-  '#f5ead8'  // warm white
+  '#ff2aa1',
+  '#ff4a1a',
+  '#d8ff00',
+  '#31ff70',
+  '#00e5ff',
+  '#1677ff',
+  '#b77cff',
+  '#f5ead8'
 ];
 
 function buildTextPalette() {
