@@ -10,95 +10,21 @@
       <aside class="panel panel-left">
         <div class="brand">MORE AMORE / POSTER GENERATOR</div>
         <div class="section-title">TEXT LAYERS — DRAG IN CANVAS</div>
-        <div class="add-layer-row">
-          <button id="addArtist" type="button">+ ARTISTA</button>
-          <button id="addInfo" type="button">+ INFO</button>
-        </div>
+        <div class="add-layer-row"><button id="addArtist" type="button">+ ARTISTA</button><button id="addInfo" type="button">+ INFO</button></div>
         <div id="fields"></div>
-
-        <div class="section-block">
-          <div class="section-title">SKETCH PNG — DRAG IN CANVAS</div>
-          <label class="upload-button">+ SKETCH PNG
-            <input id="sketchUpload" class="file-input file-input-hidden" type="file" accept="image/png,image/webp" multiple>
-          </label>
-          <div id="sketchList" class="sketch-list"></div>
-          <div class="fixed-note">Puoi caricare più PNG trasparenti: entrano nel poster e sono trascinabili.</div>
-        </div>
-
-        <div class="section-block">
-          <div class="section-title">BACKGROUND</div>
-          <div class="palette-row">
-            <button class="palette" data-palette="amore">AMORE</button>
-            <button class="palette" data-palette="acid">ACID</button>
-            <button class="palette" data-palette="night">NIGHT</button>
-            <button class="palette" data-palette="sunset">SUNSET</button>
-          </div>
-          <div class="three-colors">
-            <input id="bg1" type="color" value="#240812">
-            <input id="bg2" type="color" value="#6d173b">
-            <input id="bg3" type="color" value="#b77cff">
-          </div>
-          <label>Gradient angle<input id="bgAngle" type="range" min="0" max="360" value="135"></label>
-        </div>
-
-        <div class="section-block">
-          <div class="section-title">MAIN LOGO — FIXED / CENTERED</div>
-          <input id="logoUpload" class="file-input" type="file" accept="image/png,image/webp">
-          <div class="two">
-            <label>Depth<input id="logoDepth" type="range" min="2" max="80" value="28"></label>
-            <label>Scale<input id="logoScale" type="range" min="0.4" max="1.8" step="0.01" value="1"></label>
-          </div>
-          <label>Logo animation
-            <select id="logoAnimation">
-              <option value="none">None</option>
-              <option value="rotateY">Rotate Y</option>
-              <option value="bounce">Bounce</option>
-              <option value="wave">Wave</option>
-            </select>
-          </label>
-          <div class="fixed-note">Il logo More Amore è già incluso nel preset in alto al centro. Un upload qui lo sostituisce.</div>
-        </div>
-
-        <div class="section-block">
-          <div class="section-title">FIXED PARTNER LOGOS — BOTTOM RIGHT</div>
-          <label>Logo partner 1<input id="partnerLogo1" class="file-input" type="file" accept="image/png,image/webp"></label>
-          <label>Logo partner 2<input id="partnerLogo2" class="file-input" type="file" accept="image/png,image/webp"></label>
-          <div class="fixed-note">Due slot fissi tenuti dentro l’area sicura del poster, sempre visibili in basso a destra.</div>
-        </div>
+        <div class="section-block"><div class="section-title">SKETCH PNG — DRAG IN CANVAS</div><label class="upload-button">+ SKETCH PNG<input id="sketchUpload" class="file-input file-input-hidden" type="file" accept="image/png,image/webp" multiple></label><div id="sketchList" class="sketch-list"></div><div class="fixed-note">Puoi caricare più PNG trasparenti: entrano nel poster e sono trascinabili.</div></div>
+        <div class="section-block"><div class="section-title">BACKGROUND</div><div class="palette-row"><button class="palette" data-palette="amore">AMORE</button><button class="palette" data-palette="acid">ACID</button><button class="palette" data-palette="night">NIGHT</button><button class="palette" data-palette="sunset">SUNSET</button></div><div class="three-colors"><input id="bg1" type="color" value="#240812"><input id="bg2" type="color" value="#6d173b"><input id="bg3" type="color" value="#b77cff"></div><label>Gradient angle<input id="bgAngle" type="range" min="0" max="360" value="135"></label></div>
+        <div class="section-block"><div class="section-title">MAIN LOGO — FIXED / CENTERED</div><input id="logoUpload" class="file-input" type="file" accept="image/png,image/webp"><div class="two"><label>Depth<input id="logoDepth" type="range" min="2" max="80" value="28"></label><label>Scale<input id="logoScale" type="range" min="0.4" max="1.8" step="0.01" value="1"></label></div><label>Logo animation<select id="logoAnimation"><option value="none">None</option><option value="rotateY">Rotate Y</option><option value="bounce">Bounce</option><option value="wave">Wave</option></select></label><div class="fixed-note">Il logo More Amore è già incluso nel preset in alto al centro. Un upload qui lo sostituisce.</div></div>
+        <div class="section-block"><div class="section-title">FIXED PARTNER LOGOS — BOTTOM RIGHT</div><label>Logo partner 1<input id="partnerLogo1" class="file-input" type="file" accept="image/png,image/webp"></label><label>Logo partner 2<input id="partnerLogo2" class="file-input" type="file" accept="image/png,image/webp"></label><div class="fixed-note">Due slot fissi tenuti dentro l’area sicura del poster, sempre visibili in basso a destra.</div></div>
       </aside>
-
-      <main class="stage-wrap">
-        <div class="toolbar">
-          <button id="presetClassic">CLASSIC</button>
-          <button id="presetChrome">CHROME</button>
-          <button id="presetWarp">WARP</button>
-          <button id="exportVideo">EXPORT VIDEO</button>
-          <button id="exportPng">EXPORT PNG</button>
-        </div>
-        <div id="stage"></div>
-      </main>
-
+      <main class="stage-wrap"><div class="toolbar"><button id="presetClassic">CLASSIC</button><button id="presetChrome">CHROME</button><button id="presetWarp">WARP</button><button id="exportVideo">EXPORT VIDEO</button><button id="exportPng">EXPORT PNG</button></div><div id="stage"></div></main>
       <aside class="panel panel-right">
-        <div class="section-title">SELECTED LAYER</div>
-        <div id="selectedName" class="selected-name">—</div>
-        <label>Text<textarea id="textInput" rows="2"></textarea></label>
-        <div class="two"><label>Size<input id="size" type="range" min="10" max="180" step="1"></label><label>Depth<input id="depth" type="range" min="0" max="80" step="1"></label></div>
-        <div class="two"><label>X<input id="x" type="range" min="-500" max="500" step="1"></label><label>Y<input id="y" type="range" min="-800" max="800" step="1"></label></div>
-        <div class="two"><label>Scale X<input id="scaleX" type="range" min="0.2" max="2.5" step="0.01"></label><label>Scale Y<input id="scaleY" type="range" min="0.2" max="2.5" step="0.01"></label></div>
-        <div class="two"><label>Rotate Z<input id="rotZ" type="range" min="-45" max="45" step="0.1"></label><label>Rotate X<input id="rotX" type="range" min="-55" max="55" step="0.1"></label></div>
-        <label>Bend<input id="bend" type="range" min="-1.5" max="1.5" step="0.01"></label>
-        <div class="two"><label>Bevel<input id="bevel" type="range" min="0" max="16" step="0.5"></label><label>Metal<input id="metalness" type="range" min="0" max="1" step="0.01"></label></div>
-        <div class="two"><label>Rough<input id="roughness" type="range" min="0" max="1" step="0.01"></label><label>Color<input id="color" type="color"></label></div>
-        <div class="fx-row"><button data-fx="plastic">PLASTIC</button><button data-fx="chrome">CHROME</button><button data-fx="cream">CREAM</button></div>
-        <div class="section-block">
-          <div class="section-title">ANIMATION</div>
-          <label>Type<select id="animationType"><option value="none">None</option><option value="rotateY">Rotate Y</option><option value="bounce">Bounce</option><option value="wave">Wave</option></select></label>
-          <div class="two"><label>Speed<input id="animSpeed" type="range" min="0.1" max="4" step="0.1"></label><label>Amount<input id="animAmount" type="range" min="1" max="80" step="1"></label></div>
-        </div>
+        <div class="section-title">SELECTED LAYER</div><div id="selectedName" class="selected-name">—</div><label>Text<textarea id="textInput" rows="2"></textarea></label>
+        <div class="two"><label>Size<input id="size" type="range" min="10" max="180" step="1"></label><label>Depth<input id="depth" type="range" min="0" max="80" step="1"></label></div><div class="two"><label>X<input id="x" type="range" min="-500" max="500" step="1"></label><label>Y<input id="y" type="range" min="-800" max="800" step="1"></label></div><div class="two"><label>Scale X<input id="scaleX" type="range" min="0.2" max="2.5" step="0.01"></label><label>Scale Y<input id="scaleY" type="range" min="0.2" max="2.5" step="0.01"></label></div><div class="two"><label>Rotate Z<input id="rotZ" type="range" min="-45" max="45" step="0.1"></label><label>Rotate X<input id="rotX" type="range" min="-55" max="55" step="0.1"></label></div><label>Bend<input id="bend" type="range" min="-1.5" max="1.5" step="0.01"></label><div class="two"><label>Bevel<input id="bevel" type="range" min="0" max="16" step="0.5"></label><label>Metal<input id="metalness" type="range" min="0" max="1" step="0.01"></label></div><div class="two"><label>Rough<input id="roughness" type="range" min="0" max="1" step="0.01"></label><label>Color<input id="color" type="color"></label></div><div class="fx-row"><button data-fx="plastic">PLASTIC</button><button data-fx="chrome">CHROME</button><button data-fx="cream">CREAM</button></div><div class="section-block"><div class="section-title">ANIMATION</div><label>Type<select id="animationType"><option value="none">None</option><option value="rotateY">Rotate Y</option><option value="bounce">Bounce</option><option value="wave">Wave</option></select></label><div class="two"><label>Speed<input id="animSpeed" type="range" min="0.1" max="4" step="0.1"></label><label>Amount<input id="animAmount" type="range" min="1" max="80" step="1"></label></div></div>
       </aside>
     </div>
-
     <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/layout-defaults.js"></script>
     <script type="module" src="/src/default-logo-overlay.js"></script>
     <script type="module" src="/src/partner-overlay.js"></script>
   </body>
