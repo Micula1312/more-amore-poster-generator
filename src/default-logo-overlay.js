@@ -12,8 +12,12 @@ if (stage) {
     position: 'absolute',
     pointerEvents: 'none',
     objectFit: 'contain',
-    zIndex: '45',
-    transform: 'translateX(-50%)'
+    objectPosition: 'center center',
+    display: 'block',
+    zIndex: '200',
+    transform: 'translateX(-50%)',
+    transformOrigin: 'top center',
+    opacity: '1'
   });
 
   stage.appendChild(logo);
@@ -26,21 +30,27 @@ if (stage) {
     const left = canvasRect.left - stageRect.left;
     const top = canvasRect.top - stageRect.top;
 
+    // Keep the complete PNG safely inside the top of the poster.
     logo.style.left = `${left + canvasRect.width / 2}px`;
-    logo.style.top = `${top + canvasRect.height * 0.035}px`;
-    logo.style.width = `${canvasRect.width * 0.43}px`;
-    logo.style.height = `${canvasRect.height * 0.13}px`;
+    logo.style.top = `${top + canvasRect.height * 0.025}px`;
+    logo.style.width = `${canvasRect.width * 0.46}px`;
+    logo.style.height = 'auto';
+    logo.style.maxHeight = `${canvasRect.height * 0.15}px`;
   }
 
   const observer = new ResizeObserver(syncLogoToCanvas);
   observer.observe(stage);
   window.addEventListener('resize', syncLogoToCanvas);
-  logo.addEventListener('load', syncLogoToCanvas);
+  logo.addEventListener('load', () => {
+    logo.style.visibility = 'visible';
+    syncLogoToCanvas();
+  });
   requestAnimationFrame(syncLogoToCanvas);
   setTimeout(syncLogoToCanvas, 250);
+  setTimeout(syncLogoToCanvas, 700);
 
-  // Once a custom main logo is uploaded, hide the preset logo to avoid duplication.
+  // A custom main logo replaces the preset logo.
   document.querySelector('#logoUpload')?.addEventListener('change', e => {
-    if (e.target.files?.[0]) logo.style.display = 'none';
+    logo.style.display = e.target.files?.[0] ? 'none' : 'block';
   });
 }
