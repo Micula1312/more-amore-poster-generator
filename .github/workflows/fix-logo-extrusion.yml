@@ -1,0 +1,38 @@
+name: Fix PNG logo extrusion silhouette
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.github/workflows/fix-logo-extrusion.yml']
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch main logo extrusion and partner duplication
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('src/main.js')
+          s=p.read_text()
+          old="""const shell=new THREE.Mesh(new THREE.BoxGeometry(logoState.width,logoState.height,Math.max(2,logoState.depth)),[sideMaterial,sideMaterial,sideMaterial,sideMaterial,invisible,invisible]);shell.position.z=-logoState.depth/2;group.add(shell);"""
+          new="""// Do not extrude the rectangular PNG plane: depth is built only from alpha-textured slices,
+          // so transparent pixels stay transparent and the extrusion follows the visible logo silhouette.
+          const shell=null;"""
+          if old not in s:
+              raise SystemExit('logo shell pattern not found')
+          s=s.replace(old,new,1)
+          # main.js must not also render partner logos; partner-overlay.js owns those two fixed slots.
+          old2="""document.querySelectorAll('#partnerLogo1,#partnerLogo2').forEach((input,index)=>input.addEventListener('change',e=>{const file=e.target.files?.[0];if(!file)return;loadImageAsTexture(file,132,74,({texture,width,height})=>{const s=partnerStates[index];if(s.texture)s.texture.dispose();s.texture=texture;s.width=width;s.height=height;buildPartnerLogo(index);});}));"""
+          if old2 in s:
+              s=s.replace(old2,"// Partner logos are handled exclusively by partner-overlay.js to avoid duplicate center/3D copies.",1)
+          p.write_text(s)
+          PY
+      - name: Commit
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add src/main.js
+          git commit -m "Fix logo alpha extrusion and partner duplicates" || exit 0
+          git push
