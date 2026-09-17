@@ -1,12 +1,11 @@
 const DEFAULTS = {
-  logo:     { size:44, depth:18, x:0, y:400, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:3, metalness:.15, roughness:.3, color:'#fff1dc', animation:'none', animSpeed:1, animAmount:18 },
   guest:    { size:58, depth:24, x:0, y:250, scaleX:.9, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:4, metalness:.25, roughness:.2, color:'#b77cff', animation:'none', animSpeed:1, animAmount:24 },
-  support1: { size:34, depth:12, x:0, y:105, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:2.5, metalness:.05, roughness:.4, color:'#f5ead8', animation:'none', animSpeed:1, animAmount:18 },
+  support1: { size:34, depth:12, x:0, y:100, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:2.5, metalness:.05, roughness:.4, color:'#f5ead8', animation:'none', animSpeed:1, animAmount:18 },
   support2: { size:34, depth:12, x:0, y:25, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:2.5, metalness:.05, roughness:.4, color:'#f5ead8', animation:'none', animSpeed:1, animAmount:18 },
-  venue:    { size:40, depth:14, x:0, y:-125, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:3, metalness:.15, roughness:.28, color:'#ff4a1a', animation:'none', animSpeed:1, animAmount:18 },
-  address:  { size:20, depth:7, x:0, y:-215, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:1.5, metalness:.1, roughness:.45, color:'#ff4a1a', animation:'none', animSpeed:1, animAmount:14 },
-  date:     { size:40, depth:14, x:0, y:-390, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:3, metalness:.25, roughness:.25, color:'#b77cff', animation:'none', animSpeed:1, animAmount:18 },
-  time:     { size:24, depth:8, x:0, y:-485, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:1.5, metalness:.05, roughness:.4, color:'#f5ead8', animation:'none', animSpeed:1, animAmount:14 }
+  venue:    { size:40, depth:14, x:0, y:-145, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:3, metalness:.15, roughness:.28, color:'#ff4a1a', animation:'none', animSpeed:1, animAmount:18 },
+  address:  { size:20, depth:7, x:0, y:-235, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:1.5, metalness:.1, roughness:.45, color:'#ff4a1a', animation:'none', animSpeed:1, animAmount:14 },
+  date:     { size:40, depth:14, x:-155, y:-420, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:3, metalness:.25, roughness:.25, color:'#b77cff', animation:'none', animSpeed:1, animAmount:18 },
+  time:     { size:24, depth:8, x:-155, y:-505, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:0, bevel:1.5, metalness:.05, roughness:.4, color:'#f5ead8', animation:'none', animSpeed:1, animAmount:14 }
 };
 
 const controls = {
@@ -22,6 +21,16 @@ function setControl(selector, value, eventType='input') {
   el.dispatchEvent(new Event(eventType, { bubbles:true }));
 }
 
+function setLayerText(id, text) {
+  const btn = document.querySelector(`.field-btn[data-id="${CSS.escape(id)}"]`);
+  const input = document.querySelector('#textInput');
+  if (!btn || !input) return false;
+  btn.click();
+  input.value = text;
+  input.dispatchEvent(new Event('input', { bubbles:true }));
+  return true;
+}
+
 function applyDefaultsToLayer(id, defaults = DEFAULTS[id]) {
   const btn = document.querySelector(`.field-btn[data-id="${CSS.escape(id)}"]`);
   if (!btn || !defaults) return false;
@@ -29,14 +38,58 @@ function applyDefaultsToLayer(id, defaults = DEFAULTS[id]) {
   Object.entries(defaults).forEach(([key, value]) => {
     const selector = controls[key];
     if (!selector) return;
-    const eventType = key === 'animation' ? 'change' : 'input';
-    setControl(selector, value, eventType);
+    setControl(selector, value, key === 'animation' ? 'change' : 'input');
   });
   return true;
 }
 
+function ensurePresetArtists() {
+  setLayerText('support1', 'AURORA');
+  setLayerText('support2', 'OLIVIA');
+
+  let romina = document.querySelector('.field-btn[data-preset-romina="true"]');
+  if (!romina) {
+    document.querySelector('#addArtist')?.click();
+    romina = document.querySelector('.field-btn.active');
+    if (romina) romina.dataset.presetRomina = 'true';
+  } else {
+    romina.click();
+  }
+
+  if (romina) {
+    const input = document.querySelector('#textInput');
+    if (input) {
+      input.value = 'ROMINA';
+      input.dispatchEvent(new Event('input', { bubbles:true }));
+    }
+    setControl('#size', 34);
+    setControl('#depth', 12);
+    setControl('#x', 0);
+    setControl('#y', -50);
+    setControl('#scaleX', 1);
+    setControl('#scaleY', 1);
+    setControl('#rotZ', 0);
+    setControl('#rotX', 0);
+    setControl('#bend', 0);
+    setControl('#bevel', 2.5);
+    setControl('#metalness', .05);
+    setControl('#roughness', .4);
+    setControl('#color', '#f5ead8');
+    setControl('#animationType', 'none', 'change');
+  }
+}
+
+function hideLegacyMoreAmoreText() {
+  // The official PNG logo is the preset header; keep the old text layer empty.
+  setLayerText('logo', ' ');
+  const btn = document.querySelector('.field-btn[data-id="logo"]');
+  if (btn) btn.style.display = 'none';
+}
+
 function applySafeInitialLayout() {
+  hideLegacyMoreAmoreText();
   Object.keys(DEFAULTS).forEach(id => applyDefaultsToLayer(id));
+  ensurePresetArtists();
   document.querySelector('.field-btn[data-id="guest"]')?.click();
 }
 
@@ -48,8 +101,6 @@ function resetSelectedLayer() {
     applyDefaultsToLayer(id);
     return;
   }
-
-  // Dynamic ARTISTA / INFO layers: neutral transform/effects, keep current text.
   const fallback = {
     x:0, y:0, scaleX:1, scaleY:1, rotZ:0, rotX:0, bend:0,
     bevel:2, metalness:.05, roughness:.4, animation:'none', animSpeed:1, animAmount:16
@@ -78,7 +129,6 @@ function ensureResetButton() {
 function boot() {
   ensureResetButton();
   applySafeInitialLayout();
-  // Run again after font loading/rebuild so the first frame is also guaranteed safe.
   setTimeout(applySafeInitialLayout, 500);
 }
 
