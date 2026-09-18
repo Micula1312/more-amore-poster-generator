@@ -1,6 +1,7 @@
 const stage = document.querySelector('#stage');
 const input1 = document.querySelector('#partnerLogo1');
 const input2 = document.querySelector('#partnerLogo2');
+const whiteToggle = document.querySelector('#partnerWhiteOverlay');
 
 if (stage && input1 && input2) {
   stage.style.position = 'relative';
@@ -22,6 +23,7 @@ if (stage && input1 && input2) {
   });
 
   const whiteImages = [null, null];
+  const originalImages = [null, null];
   const urls = [null, null];
 
   function makeWhiteAlphaLogo(sourceImage, done) {
@@ -68,28 +70,38 @@ if (stage && input1 && input2) {
     });
   }
 
+  function renderSlot(index) {
+    const img = whiteToggle?.checked !== false ? whiteImages[index] : originalImages[index];
+    if (!img) return;
+    slots[index].src = img.src;
+    slots[index].style.display = 'block';
+    syncOverlayToCanvas();
+  }
+
   function setLogo(index, file) {
     if (!file) return;
     if (urls[index]) URL.revokeObjectURL(urls[index]);
     urls[index] = URL.createObjectURL(file);
     const image = new Image();
-    image.onload = () => makeWhiteAlphaLogo(image, (white, whiteUrl) => {
-      whiteImages[index] = white;
-      slots[index].src = whiteUrl;
-      slots[index].style.display = 'block';
-      syncOverlayToCanvas();
-    });
+    image.onload = () => {
+      originalImages[index] = image;
+      makeWhiteAlphaLogo(image, (white) => {
+        whiteImages[index] = white;
+        renderSlot(index);
+      });
+    };
     image.src = urls[index];
   }
 
   function setDefaultLogo(index, src) {
     const image = new Image();
-    image.onload = () => makeWhiteAlphaLogo(image, (white, whiteUrl) => {
-      whiteImages[index] = white;
-      slots[index].src = whiteUrl;
-      slots[index].style.display = 'block';
-      syncOverlayToCanvas();
-    });
+    image.onload = () => {
+      originalImages[index] = image;
+      makeWhiteAlphaLogo(image, (white) => {
+        whiteImages[index] = white;
+        renderSlot(index);
+      });
+    };
     image.src = src;
   }
 
@@ -98,6 +110,7 @@ if (stage && input1 && input2) {
 
   input1.addEventListener('change', e => setLogo(0, e.target.files?.[0]));
   input2.addEventListener('change', e => setLogo(1, e.target.files?.[0]));
+  whiteToggle?.addEventListener('change', () => { renderSlot(0); renderSlot(1); });
 
   const observer = new ResizeObserver(syncOverlayToCanvas);
   observer.observe(stage);
@@ -122,7 +135,7 @@ if (stage && input1 && input2) {
       const maxW=150,maxH=84,rightMargin=86,bottomMargin=86,gap=24;
       let right=out.width-rightMargin;
       for(let i=whiteImages.length-1;i>=0;i--){
-        const img=whiteImages[i]; if(!img) continue;
+        const img=(whiteToggle?.checked !== false ? whiteImages[i] : originalImages[i]); if(!img) continue;
         const ratio=Math.min(maxW/img.naturalWidth,maxH/img.naturalHeight,1);
         const w=img.naturalWidth*ratio,h=img.naturalHeight*ratio;
         const x=right-w,y=out.height-bottomMargin-h;
