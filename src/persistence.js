@@ -41,6 +41,20 @@ async function restoreFiles(){
     }catch(e){ console.warn('Could not restore',id,e); }
   }
 }
+function addSaveButton(){
+  const toolbar=document.querySelector('.toolbar'); if(!toolbar||document.querySelector('#saveCurrentState')) return;
+  const b=document.createElement('button'); b.id='saveCurrentState'; b.textContent='SAVE';
+  b.title='Salva ora tutti i data entry correnti';
+  b.onclick=()=>{
+    saveState();
+    const old=b.textContent;
+    b.textContent='SAVED ✓';
+    b.classList.add('saved-flash');
+    setTimeout(()=>{b.textContent=old;b.classList.remove('saved-flash')},1100);
+  };
+  toolbar.insertBefore(b,document.querySelector('#exportVideo'));
+}
+
 function addResetButton(){
   const toolbar=document.querySelector('.toolbar'); if(!toolbar||document.querySelector('#resetSavedState')) return;
   const b=document.createElement('button'); b.id='resetSavedState'; b.textContent='RESET DEFAULT';
@@ -50,6 +64,7 @@ function addResetButton(){
 }
 
 window.addEventListener('DOMContentLoaded',()=>{
+  addSaveButton();
   addResetButton();
   // main.js installs its listeners during module evaluation; restore one tick later.
   setTimeout(async()=>{ restoreState(); await restoreFiles(); },500);
