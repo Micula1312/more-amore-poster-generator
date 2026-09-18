@@ -5,7 +5,7 @@ if (stage) {
 
   const logo = document.createElement('img');
   logo.id = 'more-amore-default-logo';
-  logo.src = '/logo-more-main.png';
+  logo.src = `${import.meta.env.BASE_URL}logo-more-main.png`;
   logo.alt = 'More Amore';
 
   Object.assign(logo.style, {
