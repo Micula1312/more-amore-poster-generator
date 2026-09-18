@@ -17,39 +17,54 @@ if (stage) {
     zIndex: '200',
     transform: 'translate(-50%, -50%)',
     transformOrigin: 'center center',
-    opacity: '1'
+    opacity: '0'
   });
 
   stage.appendChild(logo);
 
   function syncLogoToCanvas() {
     const canvas = stage.querySelector('canvas');
-    if (!canvas) return;
-    const stageRect = stage.getBoundingClientRect();
-    const canvasRect = canvas.getBoundingClientRect();
-    const left = canvasRect.left - stageRect.left;
-    const top = canvasRect.top - stageRect.top;
-    const safeX = canvasRect.width * 0.075;
-    const safeY = canvasRect.height * 0.065;
-    const logoBandHeight = canvasRect.height * 0.13;
+    if (!canvas || !logo.naturalWidth || !logo.naturalHeight) return;
 
-    // Fixed header band inside the same safe margin used by the poster content.
-    logo.style.left = `${left + canvasRect.width / 2}px`;
-    logo.style.top = `${top + safeY + logoBandHeight / 2}px`;
-    logo.style.width = `${Math.min(canvasRect.width * 0.46, canvasRect.width - safeX * 2)}px`;
-    logo.style.height = 'auto';
-    logo.style.maxHeight = `${logoBandHeight}px`;
+    // Use layout dimensions instead of getBoundingClientRect(): body zoom must not
+    // distort the overlay coordinates.
+    const cw = canvas.offsetWidth;
+    const ch = canvas.offsetHeight;
+    const left = canvas.offsetLeft;
+    const top = canvas.offsetTop;
+    const safeY = ch * (86 / 1350);
+    const bandH = ch * (150 / 1350);
+    const maxW = cw * (430 / 1080);
+    const ratio = logo.naturalWidth / logo.naturalHeight;
+
+    let w = maxW;
+    let h = w / ratio;
+    if (h > bandH) {
+      h = bandH;
+      w = h * ratio;
+    }
+
+    logo.style.left = `${left + cw / 2}px`;
+    logo.style.top = `${top + safeY + bandH / 2}px`;
+    logo.style.width = `${w}px`;
+    logo.style.height = `${h}px`;
+    logo.style.maxWidth = 'none';
+    logo.style.maxHeight = 'none';
+    logo.style.opacity = '1';
   }
 
   const observer = new ResizeObserver(syncLogoToCanvas);
   observer.observe(stage);
+  const canvas = stage.querySelector('canvas');
+  if (canvas) observer.observe(canvas);
   window.addEventListener('resize', syncLogoToCanvas);
-  logo.addEventListener('load', syncLogoToCanvas);
-  requestAnimationFrame(syncLogoToCanvas);
-  setTimeout(syncLogoToCanvas, 250);
-  setTimeout(syncLogoToCanvas, 700);
+  logo.addEventListener('load', () => {
+    requestAnimationFrame(syncLogoToCanvas);
+    setTimeout(syncLogoToCanvas, 80);
+  });
 
-  // A custom main logo replaces the preset logo. Its Three.js slot uses the same header area.
+  if (logo.complete && logo.naturalWidth) requestAnimationFrame(syncLogoToCanvas);
+
   document.querySelector('#logoUpload')?.addEventListener('change', e => {
     logo.style.display = e.target.files?.[0] ? 'none' : 'block';
   });
