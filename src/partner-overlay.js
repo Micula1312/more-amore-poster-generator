@@ -82,6 +82,20 @@ if (stage && input1 && input2) {
     image.src = urls[index];
   }
 
+  function setDefaultLogo(index, src) {
+    const image = new Image();
+    image.onload = () => makeWhiteAlphaLogo(image, (white, whiteUrl) => {
+      whiteImages[index] = white;
+      slots[index].src = whiteUrl;
+      slots[index].style.display = 'block';
+      syncOverlayToCanvas();
+    });
+    image.src = src;
+  }
+
+  // Default More Amore short mark occupies partner slot 1 until the user replaces it.
+  setDefaultLogo(0, '/logo-more-short.png');
+
   input1.addEventListener('change', e => setLogo(0, e.target.files?.[0]));
   input2.addEventListener('change', e => setLogo(1, e.target.files?.[0]));
 
