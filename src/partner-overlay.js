@@ -106,7 +106,7 @@ if (stage && input1 && input2) {
   }
 
   // Default More Amore short mark occupies partner slot 1 until the user replaces it.
-  setDefaultLogo(0, '/logo-more-short.png');
+  setDefaultLogo(0, `${import.meta.env.BASE_URL}logo-more-short.png`);
 
   input1.addEventListener('change', e => setLogo(0, e.target.files?.[0]));
   input2.addEventListener('change', e => setLogo(1, e.target.files?.[0]));
