@@ -122,28 +122,23 @@ if (stage && input1 && input2) {
   window.addEventListener('resize', syncOverlayToCanvas);
   setTimeout(syncOverlayToCanvas, 250);
 
-  setTimeout(() => {
-    const exportButton = document.querySelector('#exportPng');
-    if (!exportButton) return;
-    exportButton.onclick = () => {
-      const source = stage.querySelector('canvas');
-      if (!source) return;
-      const out = document.createElement('canvas');
-      out.width = 1080; out.height = 1350;
-      const ctx = out.getContext('2d');
-      ctx.drawImage(source, 0, 0, out.width, out.height);
-      const maxW=150,maxH=84,rightMargin=86,bottomMargin=86,gap=24;
-      let right=out.width-rightMargin;
-      for(let i=whiteImages.length-1;i>=0;i--){
-        const img=(whiteToggle?.checked !== false ? whiteImages[i] : originalImages[i]); if(!img) continue;
-        const ratio=Math.min(maxW/img.naturalWidth,maxH/img.naturalHeight,1);
-        const w=img.naturalWidth*ratio,h=img.naturalHeight*ratio;
-        const x=right-w,y=out.height-bottomMargin-h;
-        ctx.drawImage(img,x,y,w,h); right=x-gap;
-      }
-      const a=document.createElement('a');
-      a.download='more-amore-poster.png';
-      a.href=out.toDataURL('image/png'); a.click();
-    };
-  },400);
+
+  // Composite DOM logos into the already-rendered export canvas without
+  // replacing main.js' high-resolution export handler.
+  window.addEventListener('more-amore:composite-export', e => {
+    const {ctx,width,height} = e.detail || {};
+    if (!ctx || !width || !height) return;
+    const sx=width/1080, sy=height/1350;
+    const maxW=150*sx,maxH=84*sy,rightMargin=86*sx,bottomMargin=86*sy,gap=24*sx;
+    let right=width-rightMargin;
+    for(let i=whiteImages.length-1;i>=0;i--){
+      const img=(whiteToggle?.checked !== false ? whiteImages[i] : originalImages[i]);
+      if(!img) continue;
+      const ratio=Math.min(maxW/img.naturalWidth,maxH/img.naturalHeight);
+      const w=img.naturalWidth*ratio,h=img.naturalHeight*ratio;
+      ctx.drawImage(img,right-w,height-bottomMargin-h,w,h);
+      right=right-w-gap;
+    }
+  });
+
 }
