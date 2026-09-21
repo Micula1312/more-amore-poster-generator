@@ -71,7 +71,7 @@ if (stage && input1 && input2) {
   }
 
   function renderSlot(index) {
-    const img = whiteToggle?.checked !== false ? whiteImages[index] : originalImages[index];
+    const img = whiteToggle?.checked === true ? whiteImages[index] : originalImages[index];
     if (!img) return;
     slots[index].src = img.src;
     slots[index].style.display = 'block';
@@ -132,7 +132,7 @@ if (stage && input1 && input2) {
     const maxW=150*sx,maxH=84*sy,rightMargin=86*sx,bottomMargin=86*sy,gap=24*sx;
     let right=width-rightMargin;
     for(let i=whiteImages.length-1;i>=0;i--){
-      const img=(whiteToggle?.checked !== false ? whiteImages[i] : originalImages[i]);
+      const img=(whiteToggle?.checked === true ? whiteImages[i] : originalImages[i]);
       if(!img) continue;
       const ratio=Math.min(maxW/img.naturalWidth,maxH/img.naturalHeight);
       const w=img.naturalWidth*ratio,h=img.naturalHeight*ratio;
