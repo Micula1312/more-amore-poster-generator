@@ -1,5 +1,6 @@
 // Persistent editor session: form values in localStorage, uploaded files in IndexedDB.
 const STATE_KEY = 'more-amore-editor-state-v1';
+const PROJECT_KEY = 'more-amore-project-state-v2';
 const DB_NAME = 'more-amore-poster-db';
 const STORE = 'assets';
 const FILE_IDS = ['logoUpload','partnerLogo1','partnerLogo2'];
@@ -22,6 +23,7 @@ function saveState(){
     data[el.id]=el.type==='checkbox'?el.checked:el.value;
   });
   localStorage.setItem(STATE_KEY,JSON.stringify(data));
+  try{const project=window.moreAmoreGetProjectState?.();if(project)localStorage.setItem(PROJECT_KEY,JSON.stringify(project));}catch(e){console.warn('Project autosave failed',e)}
 }
 function restoreState(){
   let data={}; try{data=JSON.parse(localStorage.getItem(STATE_KEY)||'{}')}catch{}
@@ -55,19 +57,33 @@ function addSaveButton(){
   toolbar.insertBefore(b,document.querySelector('#exportVideo'));
 }
 
+function addProjectButtons(){
+  const toolbar=document.querySelector('.toolbar'); if(!toolbar||document.querySelector('#exportProjectJson')) return;
+  const save=document.createElement('button');save.id='exportProjectJson';save.textContent='SAVE JSON';save.title='Scarica un file progetto riapribile';
+  save.onclick=()=>{const project=window.moreAmoreGetProjectState?.();if(!project)return;const blob=new Blob([JSON.stringify(project,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='more-amore-project-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+  const load=document.createElement('button');load.id='importProjectJson';load.textContent='LOAD JSON';load.title='Riapri un progetto More Amore';
+  const input=document.createElement('input');input.type='file';input.accept='application/json,.json';input.hidden=true;
+  load.onclick=()=>input.click();input.onchange=async()=>{const file=input.files?.[0];if(!file)return;try{const data=JSON.parse(await file.text());window.moreAmoreLoadProjectState?.(data);localStorage.setItem(PROJECT_KEY,JSON.stringify(data));saveState();load.textContent='LOADED ✓';setTimeout(()=>load.textContent='LOAD JSON',1100)}catch(e){console.error(e);alert('JSON progetto non valido')}input.value=''};
+  toolbar.insertBefore(save,document.querySelector('#exportVideo'));toolbar.insertBefore(load,document.querySelector('#exportVideo'));toolbar.appendChild(input)
+}
+function restoreProject(){
+  try{const data=JSON.parse(localStorage.getItem(PROJECT_KEY)||'null');if(data)window.moreAmoreLoadProjectState?.(data)}catch(e){console.warn('Project restore failed',e)}
+}
+
 function addResetButton(){
   const toolbar=document.querySelector('.toolbar'); if(!toolbar||document.querySelector('#resetSavedState')) return;
   const b=document.createElement('button'); b.id='resetSavedState'; b.textContent='RESET DEFAULT';
   b.title='Cancella valori e loghi memorizzati e torna ai valori iniziali';
-  b.onclick=async()=>{ localStorage.removeItem(STATE_KEY); await clearAssets().catch(()=>{}); location.reload(); };
+  b.onclick=async()=>{ localStorage.removeItem(STATE_KEY); localStorage.removeItem(PROJECT_KEY); await clearAssets().catch(()=>{}); location.reload(); };
   toolbar.insertBefore(b,document.querySelector('#exportVideo'));
 }
 
 window.addEventListener('DOMContentLoaded',()=>{
   addSaveButton();
   addResetButton();
+  addProjectButtons();
   // main.js installs its listeners during module evaluation; restore one tick later.
-  setTimeout(async()=>{ restoreState(); await restoreFiles(); },500);
+  setTimeout(async()=>{ restoreState(); await restoreFiles(); restoreProject(); },900);
   document.addEventListener('input',e=>{ if(!e.target.matches('input[type=file]')) saveState(); });
   document.addEventListener('change',e=>{ if(!e.target.matches('input[type=file]')) saveState(); });
   FILE_IDS.forEach(id=>document.getElementById(id)?.addEventListener('change',e=>{
