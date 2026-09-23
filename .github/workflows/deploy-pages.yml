@@ -25,6 +25,11 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install fonttools
+      - run: python scripts/build-interlope.py
       - run: npm ci
       - run: npm run build
       - uses: actions/configure-pages@v5
