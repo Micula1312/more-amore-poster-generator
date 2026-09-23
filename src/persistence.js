@@ -80,7 +80,7 @@ function addResetButton(){
 
 let historyStack=[],historyIndex=-1,historyReady=false,historyTimer=null,historyApplying=false;
 function snapshotProject(){try{return window.moreAmoreGetProjectState?.()||null}catch{return null}}
-function snapshotKey(v){try{return JSON.stringify(v)}catch{return ''}}
+function snapshotKey(v){try{const copy=JSON.parse(JSON.stringify(v));delete copy.savedAt;return JSON.stringify(copy)}catch{return ''}}
 function updateHistoryButtons(){
   const u=document.querySelector('#undoProject'),r=document.querySelector('#redoProject');
   if(u)u.disabled=historyIndex<=0;if(r)r.disabled=historyIndex<0||historyIndex>=historyStack.length-1
