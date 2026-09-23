@@ -67,3 +67,29 @@ textarea{resize:vertical}
   .stage-wrap{min-height:70vh}
   .toolbar #exportVideo{margin-left:0}
 }
+
+/* Toolbar IA: visual modes are isolated from project history and exports. */
+.toolbar{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,1fr) auto;align-items:stretch;gap:10px;padding:10px 12px;background:#0d0a0c}
+.mode-panel,.project-panel,.export-panel{border:1px solid #3a2933;background:#151014;padding:8px 10px;min-width:0}
+.mode-panel{border-color:#7b315c;background:#1a1017}
+.toolbar-section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:7px;font-size:10px;letter-spacing:.14em;color:#d7cbd1}
+.toolbar-section-head strong{font-size:9px;color:#ff75bd;font-weight:700;white-space:nowrap}
+#autosaveStatus{color:#86dca9}
+.mode-tools,.project-tools,.export-tools{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.mode-tools button{background:#171217;border-color:#654052}
+.mode-tools button.active-mode{background:#ff77bb;border-color:#ff77bb;color:#130b10;box-shadow:0 0 0 1px #ffb8dc inset}
+.toolbar-flag{display:flex;align-items:center;gap:5px;padding:5px 8px;border:1px solid #503445;background:#120e11;font-size:10px;white-space:nowrap}
+.project-tools button{font-size:10px}
+#undoProject,#redoProject{font-weight:800}
+#undoProject:disabled,#redoProject:disabled{opacity:.3;cursor:not-allowed}
+#resetSavedState{margin-left:auto;border-color:#68333e;color:#e7a7ae;background:#1b1013}
+.export-panel{border-color:#44364c}
+.export-tools{flex-wrap:nowrap}
+.export-tools button{font-weight:800;white-space:nowrap}
+.toolbar #exportVideo{margin-left:0;background:#2c1a31;border-color:#8b5cff}
+.toolbar #exportPng,.toolbar #exportStory{background:#ff3b9d;border-color:#ff3b9d;color:#fff}
+@media(max-width:1100px){
+  .toolbar{grid-template-columns:1fr}
+  .export-tools{flex-wrap:wrap}
+  #resetSavedState{margin-left:0}
+}
