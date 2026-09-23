@@ -116,9 +116,9 @@ document.addEventListener('keydown',e=>{
 
 window.addEventListener('DOMContentLoaded',()=>{
   addSaveButton();
-  addResetButton();
   addProjectButtons();
   addHistoryButtons();
+  addResetButton();
   // main.js installs its listeners during module evaluation; restore one tick later.
   setTimeout(async()=>{ restoreState(); await restoreFiles(); restoreProject(); setTimeout(()=>{historyReady=true;const first=snapshotProject();if(first){historyStack=[first];historyIndex=0;updateHistoryButtons()}},120); },900);
   document.addEventListener('input',e=>{ if(!e.target.matches('input[type=file]')){saveState();setAutosavePulse();queueHistory()} });
