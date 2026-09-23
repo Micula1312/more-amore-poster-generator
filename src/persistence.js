@@ -123,6 +123,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   setTimeout(async()=>{ restoreState(); await restoreFiles(); restoreProject(); setTimeout(()=>{historyReady=true;const first=snapshotProject();if(first){historyStack=[first];historyIndex=0;updateHistoryButtons()}},120); },900);
   document.addEventListener('input',e=>{ if(!e.target.matches('input[type=file]')){saveState();setAutosavePulse();queueHistory()} });
   document.addEventListener('change',e=>{ if(!e.target.matches('input[type=file]')){saveState();setAutosavePulse();queueHistory()} });
+  document.addEventListener('click',e=>{ if(e.target.closest('[data-mode-name],[data-fx],.palette,#sketchWide,#sketchTall'))setTimeout(()=>{saveState();setAutosavePulse();pushHistory()},0); });
   FILE_IDS.forEach(id=>document.getElementById(id)?.addEventListener('change',e=>{
     const file=e.target.files?.[0]; if(file) putAsset(id,file).catch(console.error);
   }));
